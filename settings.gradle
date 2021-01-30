@@ -1,0 +1,10 @@
+rootProject.name = 'onboarding'
+
+String[] modules = [
+        'api',
+        'dynamodb',
+        'core'
+]
+
+include modules
+
