@@ -5,5 +5,5 @@ import com.playkids.onboarding.core.model.SKUId
 
 interface SKUDAO {
     suspend fun create(sku: SKU)
-    suspend fun find(skuId: SKUId)
+    suspend fun find(skuId: SKUId): SKU?
 }

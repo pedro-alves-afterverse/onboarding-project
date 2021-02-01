@@ -7,11 +7,12 @@ import com.movile.kotlin.commons.dynamodb.toAttributeValue
 import com.playkids.onboarding.core.model.Item
 import com.playkids.onboarding.core.model.ItemId
 import com.playkids.onboarding.core.persistence.ItemDAO
-import com.playkids.onboarding.dynamodb.extensions.batchGetItems
 import com.playkids.onboarding.dynamodb.extensions.itemOrNull
+import com.playkids.onboarding.dynamodb.extensions.itemsOrNull
 import com.typesafe.config.Config
 import software.amazon.awssdk.services.dynamodb.DynamoDbAsyncClient
 import software.amazon.awssdk.services.dynamodb.model.AttributeValue
+import software.amazon.awssdk.services.dynamodb.model.QueryRequest
 
 class DynamoDBItemDAO(config: Config, private val dynamoDbClient: DynamoDbAsyncClient): ItemDAO {
 
@@ -36,8 +37,18 @@ class DynamoDBItemDAO(config: Config, private val dynamoDbClient: DynamoDbAsyncC
             ?.toItem()
 
     override suspend fun findAllByCategory(category: String): List<Item>? {
-        //TODO: batch get not working
-        return dynamoDbClient.batchGetItems(listOf(mapOf(CATEGORY to category.toAttributeValue())), tableName).map { it.toItem() }
+
+        return dynamoDbClient.query(
+            QueryRequest.builder()
+                .tableName(tableName)
+                .keyConditionExpression("$CATEGORY = :c")
+                .expressionAttributeValues(mapOf(":c" to category.toAttributeValue()))
+                .build()
+        )
+            .awaitRaiseException()
+            ?.itemsOrNull()
+            ?.map { it.toItem() }
+
     }
 
     private fun Item.toItem(): Map<String, AttributeValue> =

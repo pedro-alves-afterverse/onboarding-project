@@ -15,8 +15,6 @@ import kotlin.math.log
 
 fun Route.itemRouting(itemService: ItemService) {
 
-    val logger = logger<Route>()
-
     fun PipelineContext<*, ApplicationCall>.category(): String {
         return call.parameters["category"] ?: throw IllegalArgumentException("a category must be provided")
     }
@@ -38,10 +36,6 @@ fun Route.itemRouting(itemService: ItemService) {
         get("{category}") {
             val category = category()
 
-            logger.debug("Category:")
-            logger.debug(category)
-
-            //TODO: batch get not working
             val item = itemService.findAllByCategory(category) ?: throw NotFoundException("Category doesn't exists")
 
             call.respond(item)

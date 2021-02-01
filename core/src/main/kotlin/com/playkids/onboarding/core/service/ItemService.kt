@@ -1,6 +1,5 @@
 package com.playkids.onboarding.core.service
 
-import com.playkids.onboarding.api.extensions.logger
 import com.playkids.onboarding.core.model.Item
 import com.playkids.onboarding.core.model.ItemId
 import com.playkids.onboarding.core.persistence.ItemDAO
@@ -16,12 +15,7 @@ class ItemService(
         return itemDAO.find(category, itemId)
     }
 
-    //TODO: batch get not working
     suspend fun findAllByCategory(category: String): List<Item>? {
-        val logger = logger<ItemService>()
-        val items = itemDAO.findAllByCategory(category)
-        logger.debug("Items")
-        logger.debug(items.toString())
-        return items
+        return itemDAO.findAllByCategory(category)
     }
 }

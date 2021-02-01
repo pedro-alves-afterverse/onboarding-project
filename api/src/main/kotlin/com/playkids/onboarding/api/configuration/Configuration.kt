@@ -2,6 +2,7 @@ package com.playkids.onboarding.api.configuration
 
 import com.playkids.onboarding.api.OnboardingApi
 import com.playkids.onboarding.core.service.ItemService
+import com.playkids.onboarding.core.service.SKUService
 import com.typesafe.config.ConfigFactory
 import software.amazon.awssdk.auth.credentials.DefaultCredentialsProvider
 import software.amazon.awssdk.regions.Region
@@ -33,7 +34,11 @@ object Configuration {
         itemDAO = persistenceModule.itemDAO
     )
 
-    val server = OnboardingApi(serverPort, itemService)
+    private val skuService = SKUService(
+        skuDAO = persistenceModule.skuDAO
+    )
+
+    val server = OnboardingApi(serverPort, itemService, skuService)
 
 
 }
