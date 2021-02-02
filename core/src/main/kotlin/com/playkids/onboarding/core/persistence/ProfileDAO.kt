@@ -7,5 +7,5 @@ import com.playkids.onboarding.core.model.ProfileId
 interface ProfileDAO {
     suspend fun create(profile: Profile)
     suspend fun find(id: ProfileId): Profile?
-    suspend fun addItem(profileId: ProfileId, itemId: Int)
+    suspend fun addItem(profileId: ProfileId, itemId: List<ItemId>)
 }

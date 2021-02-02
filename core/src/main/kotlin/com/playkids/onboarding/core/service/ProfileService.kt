@@ -16,7 +16,7 @@ class ProfileService(
         return profileDAO.find(id)
     }
 
-    suspend fun addItem(profileId: ProfileId, itemId: Int){
+    suspend fun addItem(profileId: ProfileId, itemId: List<ItemId>){
         return profileDAO.addItem(profileId, itemId)
     }
 }
