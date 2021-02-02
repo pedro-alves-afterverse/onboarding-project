@@ -5,6 +5,7 @@ import com.playkids.onboarding.core.model.ItemId
 import com.playkids.onboarding.core.model.Profile
 import com.playkids.onboarding.core.model.ProfileId
 import com.playkids.onboarding.core.persistence.ProfileDAO
+import com.playkids.onboarding.core.util.ChooseValue
 import com.playkids.onboarding.dynamodb.extensions.itemOrNull
 import com.playkids.onboarding.dynamodb.extensions.listOfString
 import com.playkids.onboarding.dynamodb.extensions.toListAttributeValue
@@ -42,6 +43,19 @@ class DynamoDBProfileDAO(config: Config, private val dynamoDbClient: DynamoDbAsy
                 .updateExpression("SET #items = list_append( #items, :val)")
                 .expressionAttributeNames(mapOf("#items" to ITEMS))
                 .expressionAttributeValues(mapOf(":val" to itemId.toListAttributeValue()))
+                .build()
+        )
+            .awaitRaiseException()
+    }
+
+    override suspend fun updateCurrency(profileId: ProfileId, operation: String, currency: String, chooseValue: ChooseValue) {
+        dynamoDbClient.updateItem(
+            UpdateItemRequest.builder()
+                .tableName(tableName)
+                .key(mapOf(ID to profileId.toAttributeValue()))
+                .updateExpression("SET #currency = #currency $operation :v")
+                .expressionAttributeNames(mapOf("#currency" to currency))
+                .expressionAttributeValues(mapOf(":v" to chooseValue.chooseToAttributeValue()))
                 .build()
         )
             .awaitRaiseException()

@@ -40,7 +40,8 @@ object Configuration {
     )
 
     private val profileService = ProfileService(
-        profileDAO = persistenceModule.profileDAO
+        profileDAO = persistenceModule.profileDAO,
+        skuDAO = persistenceModule.skuDAO
     )
 
     val server = OnboardingApi(serverPort, itemService, skuService, profileService)

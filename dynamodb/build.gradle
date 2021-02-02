@@ -2,6 +2,4 @@ dependencies {
     api project(":core")
 
     api "software.amazon.awssdk:dynamodb:$awsSDK2Version"
-
-    implementation "com.movile:kotlin-commons-dynamodb:$kotlin_commons_version"
 }

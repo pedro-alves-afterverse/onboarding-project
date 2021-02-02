@@ -3,6 +3,7 @@ package com.playkids.onboarding.api.route
 import com.movile.kotlin.commons.ktor.patch
 import com.movile.kotlin.commons.ktor.post
 import com.playkids.onboarding.api.dto.AddItemDTO
+import com.playkids.onboarding.api.dto.AddSkuDTO
 import com.playkids.onboarding.core.model.Profile
 import com.playkids.onboarding.core.service.ProfileService
 import io.ktor.application.*
@@ -26,17 +27,26 @@ fun Route.profileRouting(profileService: ProfileService) {
 
             call.respond(profile)
         }
-        patch<AddItemDTO>("{id}") {item ->
-            val id = id()
-
-            profileService.addItem(id, item.itemId)
-
-            call.respondText("Item added to profile", status = HttpStatusCode.OK)
-        }
         post<Profile> { profile ->
             profileService.create(profile)
 
             call.respondText("Profile Created", status = HttpStatusCode.OK)
+        }
+        route("/add"){
+            patch<AddItemDTO>("/item/{id}") {item ->
+                val id = id()
+
+                profileService.addItem(id, item.itemIds)
+
+                call.respondText("Item added to profile", status = HttpStatusCode.OK)
+            }
+            patch<AddSkuDTO>("/sku/{id}") {sku ->
+                val id = id()
+
+                profileService.addSku(id, sku.skuId)
+
+                call.respondText("SKU added to profile", status = HttpStatusCode.OK)
+            }
         }
     }
 }
