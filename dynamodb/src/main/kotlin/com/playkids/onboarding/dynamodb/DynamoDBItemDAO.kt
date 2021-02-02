@@ -46,7 +46,7 @@ class DynamoDBItemDAO(config: Config, private val dynamoDbClient: DynamoDbAsyncC
                 .build()
         )
             .awaitRaiseException()
-            ?.itemsOrNull()
+            ?.items()
             ?.map { it.toItem() }
 
     }
