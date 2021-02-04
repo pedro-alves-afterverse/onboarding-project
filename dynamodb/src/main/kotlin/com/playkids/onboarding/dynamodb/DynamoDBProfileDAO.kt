@@ -1,6 +1,7 @@
 package com.playkids.onboarding.dynamodb
 
 import com.movile.kotlin.commons.dynamodb.*
+import com.playkids.onboarding.core.model.Item
 import com.playkids.onboarding.core.model.ItemId
 import com.playkids.onboarding.core.model.Profile
 import com.playkids.onboarding.core.model.ProfileId
@@ -61,6 +62,10 @@ class DynamoDBProfileDAO(config: Config, private val dynamoDbClient: DynamoDbAsy
             .awaitRaiseException()
     }
 
+    override suspend fun getProfileItems(id: ProfileId, projection: Map<String, String>): List<String>? =
+        this.query(id, projection)?.toItemList()
+
+
     private suspend fun query(id: ProfileId, projection: Map<String, String>? = null) =
         dynamoDbClient.getItem {
             it.tableName(tableName)
@@ -98,6 +103,9 @@ class DynamoDBProfileDAO(config: Config, private val dynamoDbClient: DynamoDbAsy
 
     private fun Map<String, AttributeValue>.toItemsCurrency(currency: String): ItemsCurrency =
         ItemsCurrency(listOfString(ITEMS)!!, int(currency)!!)
+
+    private fun Map<String, AttributeValue>.toItemList(): List<String>? =
+        listOfString(ITEMS)
 
     companion object {
         private const val ID = "id"

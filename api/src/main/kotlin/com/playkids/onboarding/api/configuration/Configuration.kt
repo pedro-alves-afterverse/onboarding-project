@@ -32,7 +32,8 @@ object Configuration {
     )
 
     private val itemService = ItemService(
-        itemDAO = persistenceModule.itemDAO
+        itemDAO = persistenceModule.itemDAO,
+        profileDAO = persistenceModule.profileDAO
     )
 
     private val skuService = SKUService(

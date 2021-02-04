@@ -10,6 +10,7 @@ interface ProfileDAO {
     suspend fun create(profile: Profile)
     suspend fun find(id: ProfileId): Profile?
     suspend fun getItemsAndCurrency(id: ProfileId, projection: Map<String, String>, currency: String): ItemsCurrency?
-    suspend fun addItem(profileId: ProfileId, item: List<ItemId>)
+    suspend fun addItem(profileId: ProfileId, item: List<String>)
     suspend fun updateCurrency(profileId: ProfileId, operation: String, currency: String, chooseValue: ChooseValue)
+    suspend fun getProfileItems(id: ProfileId, projection: Map<String, String>): List<String>?
 }

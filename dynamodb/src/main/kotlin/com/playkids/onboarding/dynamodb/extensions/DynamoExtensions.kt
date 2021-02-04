@@ -15,6 +15,6 @@ fun QueryResponse.itemsOrNull(): List<Map<String, AttributeValue>>? =
     items()?.takeIf { it.size > 0 }
 
 fun List<String>?.toListAttributeValue(): AttributeValue =
-    this?.takeIf { it.isNotEmpty() }?.let { list -> AttributeValue.builder().l(list.map { it.toAttributeValue() }).build() } ?: nullAttributeValue
+    this?.let { list -> AttributeValue.builder().l(list.map { it.toAttributeValue() }).build() } ?: nullAttributeValue
 
 fun Map<String, AttributeValue>.listOfString(attribute: String): List<String>? = this[attribute]?.l()?.map { it.s().toString() }
