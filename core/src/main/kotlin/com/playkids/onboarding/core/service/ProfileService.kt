@@ -5,13 +5,15 @@ import com.playkids.onboarding.core.model.ItemId
 import com.playkids.onboarding.core.model.Profile
 import com.playkids.onboarding.core.model.ProfileId
 import com.playkids.onboarding.core.model.SKUId
+import com.playkids.onboarding.core.persistence.ItemDAO
 import com.playkids.onboarding.core.persistence.ProfileDAO
 import com.playkids.onboarding.core.persistence.SKUDAO
 import com.playkids.onboarding.core.util.ChooseValue
 
 class ProfileService(
     private val profileDAO: ProfileDAO,
-    private val skuDAO: SKUDAO
+    private val skuDAO: SKUDAO,
+    private val itemDAO: ItemDAO
 ) {
     suspend fun create(profile: Profile){
         profileDAO.create(profile)
@@ -21,8 +23,22 @@ class ProfileService(
         return profileDAO.find(id)
     }
 
-    suspend fun addItem(profileId: ProfileId, itemIds: List<ItemId>){
-        return profileDAO.addItem(profileId, itemIds)
+    suspend fun addItem(profileId: ProfileId, itemId: ItemId){
+        return profileDAO.addItem(profileId, listOf(itemId))
+    }
+
+    suspend fun buyItem(profileId: ProfileId, itemId: ItemId, itemCategory: String, currency: String){
+        val item = itemDAO.find(itemCategory, itemId) ?: throw EntityNotFoundException("Item with id $itemId and category $itemCategory doesn't exists")
+        val price = when(currency){
+            COIN -> item.coinPrice
+            GEM -> item.gemPrice
+            else -> {
+                throw IllegalArgumentException("currency $currency doesn't exists")
+            }
+        } ?: throw IllegalArgumentException("Item doesn't have attribute $currency")
+        profileDAO.updateCurrency(profileId, "-", currency, ChooseValue(price, null))
+        //TODO: VERIFICAR SE O USER TEM O DINHEIRO DISPONIVEL
+        profileDAO.addItem(profileId, listOf(itemId))
     }
 
     suspend fun addSku(profileId: ProfileId, skuId: SKUId){
@@ -31,5 +47,10 @@ class ProfileService(
         profileDAO.updateCurrency(profileId, "+", "coin", ChooseValue(sku.coin, null))
         profileDAO.updateCurrency(profileId, "+", "gem", ChooseValue(sku.gem, null))
         profileDAO.updateCurrency(profileId, operation = "+", currency = "moneySpent", ChooseValue(null, sku.price))
+    }
+
+    companion object {
+        private const val COIN = "coin"
+        private const val GEM = "gem"
     }
 }

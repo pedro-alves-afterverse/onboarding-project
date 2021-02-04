@@ -36,6 +36,7 @@ class DynamoDBProfileDAO(config: Config, private val dynamoDbClient: DynamoDbAsy
             ?.toProfile()
 
     override suspend fun addItem(profileId: ProfileId, itemId: List<ItemId>) {
+        //TODO: RECEBER CATEGORIA DO ITEM TBM E ESTRUTURAR AMBOS
         dynamoDbClient.updateItem(
             UpdateItemRequest.builder()
                 .tableName(tableName)
