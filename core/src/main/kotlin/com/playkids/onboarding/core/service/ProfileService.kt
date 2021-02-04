@@ -1,6 +1,7 @@
 package com.playkids.onboarding.core.service
 
 import com.playkids.onboarding.core.excption.EntityNotFoundException
+import com.playkids.onboarding.core.excption.NotEnoughCurrency
 import com.playkids.onboarding.core.model.ItemId
 import com.playkids.onboarding.core.model.Profile
 import com.playkids.onboarding.core.model.ProfileId
@@ -23,8 +24,8 @@ class ProfileService(
         return profileDAO.find(id)
     }
 
-    suspend fun addItem(profileId: ProfileId, itemId: ItemId){
-        return profileDAO.addItem(profileId, listOf(itemId))
+    suspend fun addItem(profileId: ProfileId, itemId: ItemId, itemCategory: String){
+        return profileDAO.addItem(profileId, listOf("$itemCategory:$itemId"))
     }
 
     suspend fun buyItem(profileId: ProfileId, itemId: ItemId, itemCategory: String, currency: String){
@@ -36,9 +37,10 @@ class ProfileService(
                 throw IllegalArgumentException("currency $currency doesn't exists")
             }
         } ?: throw IllegalArgumentException("Item doesn't have attribute $currency")
+        val currencyAmount = profileDAO.getCurrency(profileId, currency) ?: throw EntityNotFoundException("profile with id $profileId doesn't exists")
+        if (price > currencyAmount) throw NotEnoughCurrency("profile with id $profileId doesn't have enough $currency to buy item")
         profileDAO.updateCurrency(profileId, "-", currency, ChooseValue(price, null))
-        //TODO: VERIFICAR SE O USER TEM O DINHEIRO DISPONIVEL
-        profileDAO.addItem(profileId, listOf(itemId))
+        profileDAO.addItem(profileId, listOf("$itemCategory:$itemId"))
     }
 
     suspend fun addSku(profileId: ProfileId, skuId: SKUId){

@@ -35,15 +35,26 @@ class DynamoDBProfileDAO(config: Config, private val dynamoDbClient: DynamoDbAsy
             ?.itemOrNull()
             ?.toProfile()
 
-    override suspend fun addItem(profileId: ProfileId, itemId: List<ItemId>) {
-        //TODO: RECEBER CATEGORIA DO ITEM TBM E ESTRUTURAR AMBOS
+    override suspend fun getCurrency(id: ProfileId, currency: String): Int? =
+        dynamoDbClient.getItem {
+            it.tableName(tableName)
+                .key(mapOf(ID to id.toAttributeValue()))
+                .projectionExpression(currency)
+        }
+            .awaitRaiseException()
+            ?.itemOrNull()
+            ?.toCurrencyValue(currency)
+
+
+
+    override suspend fun addItem(profileId: ProfileId, item: List<ItemId>) {
         dynamoDbClient.updateItem(
             UpdateItemRequest.builder()
                 .tableName(tableName)
                 .key(mapOf(ID to profileId.toAttributeValue()))
                 .updateExpression("SET #items = list_append( #items, :val)")
                 .expressionAttributeNames(mapOf("#items" to ITEMS))
-                .expressionAttributeValues(mapOf(":val" to itemId.toListAttributeValue()))
+                .expressionAttributeValues(mapOf(":val" to item.toListAttributeValue()))
                 .build()
         )
             .awaitRaiseException()
@@ -83,6 +94,9 @@ class DynamoDBProfileDAO(config: Config, private val dynamoDbClient: DynamoDbAsy
             gem = int(GEM)!!,
             moneySpent = float(MONEY_SPENT)!!
         )
+
+    private fun Map<String, AttributeValue>.toCurrencyValue(currency: String): Int? =
+        int(currency)
 
     companion object {
         private const val ID = "id"

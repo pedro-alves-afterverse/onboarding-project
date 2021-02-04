@@ -37,7 +37,7 @@ fun Route.profileRouting(profileService: ProfileService) {
             patch<AddItemDTO>("/item/{id}") {item ->
                 val id = id()
 
-                profileService.addItem(id, item.itemId)
+                profileService.addItem(id, item.id, item.category)
 
                 call.respondText("Item added to profile", status = HttpStatusCode.OK)
             }

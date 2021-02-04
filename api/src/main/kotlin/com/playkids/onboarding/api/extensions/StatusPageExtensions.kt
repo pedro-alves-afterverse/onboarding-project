@@ -2,6 +2,7 @@ package com.playkids.onboarding.api.extensions
 
 import com.playkids.onboarding.api.response.ErrorResponse
 import com.playkids.onboarding.core.excption.EntityNotFoundException
+import com.playkids.onboarding.core.excption.NotEnoughCurrency
 import io.ktor.application.*
 import io.ktor.features.*
 import io.ktor.http.*
@@ -20,6 +21,12 @@ fun StatusPages.Configuration.exceptions(logger: Logger) {
         logger.warn("Failed to process request {}: {}", call.request.toLogString(), it.message, it)
 
         call.respond(HttpStatusCode.NotFound, ErrorResponse(HttpStatusCode.NotFound, it.message ?: ""))
+    }
+
+    exception<NotEnoughCurrency> {
+        logger.warn("Failed to process request {}: {}", call.request.toLogString(), it.message, it)
+
+        call.respond(HttpStatusCode.NotFound, ErrorResponse(HttpStatusCode.PreconditionFailed, it.message ?: ""))
     }
 
     exception<IllegalArgumentException> {
