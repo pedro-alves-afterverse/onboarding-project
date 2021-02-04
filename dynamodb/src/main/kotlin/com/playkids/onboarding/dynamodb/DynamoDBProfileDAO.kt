@@ -6,6 +6,7 @@ import com.playkids.onboarding.core.model.Profile
 import com.playkids.onboarding.core.model.ProfileId
 import com.playkids.onboarding.core.persistence.ProfileDAO
 import com.playkids.onboarding.core.util.ChooseValue
+import com.playkids.onboarding.core.util.ItemsCurrency
 import com.playkids.onboarding.dynamodb.extensions.itemOrNull
 import com.playkids.onboarding.dynamodb.extensions.listOfString
 import com.playkids.onboarding.dynamodb.extensions.toListAttributeValue
@@ -27,23 +28,10 @@ class DynamoDBProfileDAO(config: Config, private val dynamoDbClient: DynamoDbAsy
     }
 
     override suspend fun find(id: ProfileId): Profile? =
-        dynamoDbClient.getItem {
-            it.tableName(tableName)
-                .key(mapOf(ID to id.toAttributeValue()))
-        }
-            .awaitRaiseException()
-            ?.itemOrNull()
-            ?.toProfile()
+        this.query(id)?.toProfile()
 
-    override suspend fun getCurrency(id: ProfileId, currency: String): Int? =
-        dynamoDbClient.getItem {
-            it.tableName(tableName)
-                .key(mapOf(ID to id.toAttributeValue()))
-                .projectionExpression(currency)
-        }
-            .awaitRaiseException()
-            ?.itemOrNull()
-            ?.toCurrencyValue(currency)
+    override suspend fun getItemsAndCurrency(id: ProfileId, projection: Map<String, String>, currency: String): ItemsCurrency? =
+        this.query(id, projection)?.toItemsCurrency(currency)
 
 
 
@@ -73,6 +61,18 @@ class DynamoDBProfileDAO(config: Config, private val dynamoDbClient: DynamoDbAsy
             .awaitRaiseException()
     }
 
+    private suspend fun query(id: ProfileId, projection: Map<String, String>? = null) =
+        dynamoDbClient.getItem {
+            it.tableName(tableName)
+                .key(mapOf(ID to id.toAttributeValue()))
+                .also { projection?.let { exp ->
+                    it.projectionExpression(exp.keys.joinToString())
+                    it.expressionAttributeNames(projection)
+                }}
+        }
+            .awaitRaiseException()
+            ?.itemOrNull()
+
 
     private fun Profile.toItem(): Map<String, AttributeValue> =
         mapOf(
@@ -95,8 +95,9 @@ class DynamoDBProfileDAO(config: Config, private val dynamoDbClient: DynamoDbAsy
             moneySpent = float(MONEY_SPENT)!!
         )
 
-    private fun Map<String, AttributeValue>.toCurrencyValue(currency: String): Int? =
-        int(currency)
+
+    private fun Map<String, AttributeValue>.toItemsCurrency(currency: String): ItemsCurrency =
+        ItemsCurrency(listOfString(ITEMS)!!, int(currency)!!)
 
     companion object {
         private const val ID = "id"
