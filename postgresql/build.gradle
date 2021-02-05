@@ -1,0 +1,18 @@
+plugins {
+    id "org.flywaydb.flyway" version "$flywayVersion"
+}
+
+dependencies {
+    implementation "org.postgresql:postgresql:$postgresqlJDBCVersion"
+    api "org.flywaydb:flyway-core:$flywayVersion"
+
+}
+
+flyway {
+    url = "jdbc:postgresql://localhost:5432/onboarding"
+    user = "postgres"
+    password = "postgres"
+    schemas = ["public"]
+}
+
+flywayMigrate.dependsOn classes

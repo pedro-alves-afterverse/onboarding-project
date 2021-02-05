@@ -3,7 +3,8 @@ rootProject.name = 'onboarding'
 String[] modules = [
         'api',
         'dynamodb',
-        'core'
+        'core',
+        'postgresql'
 ]
 
 include modules
