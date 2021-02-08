@@ -1,10 +1,7 @@
 package com.playkids.onboarding.dynamodb
 
 import com.movile.kotlin.commons.dynamodb.*
-import com.playkids.onboarding.core.model.Item
-import com.playkids.onboarding.core.model.ItemId
-import com.playkids.onboarding.core.model.Profile
-import com.playkids.onboarding.core.model.ProfileId
+import com.playkids.onboarding.core.model.*
 import com.playkids.onboarding.core.persistence.ProfileDAO
 import com.playkids.onboarding.core.util.ChooseValue
 import com.playkids.onboarding.core.util.ItemsCurrency
@@ -86,7 +83,8 @@ class DynamoDBProfileDAO(config: Config, private val dynamoDbClient: DynamoDbAsy
             ITEMS to items.toListAttributeValue(),
             COIN to coin.toAttributeValue(),
             GEM to gem.toAttributeValue(),
-            MONEY_SPENT to moneySpent.toAttributeValue()
+            MONEY_SPENT to moneySpent.toAttributeValue(),
+            REGION to region.toString().toAttributeValue()
         )
 
 
@@ -97,7 +95,8 @@ class DynamoDBProfileDAO(config: Config, private val dynamoDbClient: DynamoDbAsy
             items =  listOfString(ITEMS)!!,
             coin = int(COIN)!!,
             gem = int(GEM)!!,
-            moneySpent = float(MONEY_SPENT)!!
+            moneySpent = float(MONEY_SPENT)!!,
+            region = Regions.valueOf(string(REGION)!!)
         )
 
 
@@ -114,5 +113,6 @@ class DynamoDBProfileDAO(config: Config, private val dynamoDbClient: DynamoDbAsy
         private const val COIN = "coin"
         private const val GEM = "gem"
         private const val MONEY_SPENT = "moneySpent"
+        private const val REGION = "region"
     }
 }
