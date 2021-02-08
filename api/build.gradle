@@ -8,10 +8,12 @@ dependencies {
     implementation "io.ktor:ktor-server-core:$ktor_version"
     implementation "io.ktor:ktor-server-host-common:$ktor_version"
     implementation "io.ktor:ktor-jackson:$ktor_version"
+    implementation "software.amazon.awssdk:sqs:$awsSDK2Version"
+
     testImplementation "io.ktor:ktor-server-tests:$ktor_version"
 
     implementation "com.movile:kotlin-commons-ktorio:$kotlin_commons_version"
 
 }
 
-mainClassName = "com.playkids.onboarding.api.MainKt"
+mainClassName = "com.playkids.onboarding.api.ApiMainKt"

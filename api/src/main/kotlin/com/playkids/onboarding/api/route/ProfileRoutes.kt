@@ -5,6 +5,7 @@ import com.movile.kotlin.commons.ktor.post
 import com.playkids.onboarding.api.dto.AddItemDTO
 import com.playkids.onboarding.api.dto.AddSkuDTO
 import com.playkids.onboarding.api.dto.BuyItemDTO
+import com.playkids.onboarding.api.sqs.SQSEventEmitter
 import com.playkids.onboarding.core.model.Profile
 import com.playkids.onboarding.core.service.ProfileService
 import io.ktor.application.*
@@ -14,7 +15,10 @@ import io.ktor.response.*
 import io.ktor.routing.*
 import io.ktor.util.pipeline.*
 
-fun Route.profileRouting(profileService: ProfileService) {
+fun Route.profileRouting(
+    profileService: ProfileService,
+    sqsEventEmitter: SQSEventEmitter
+) {
 
     fun PipelineContext<*, ApplicationCall>.id(): String {
         return call.parameters["id"] ?: throw IllegalArgumentException("an id must be provided")
@@ -30,6 +34,8 @@ fun Route.profileRouting(profileService: ProfileService) {
         }
         post<Profile> { profile ->
             profileService.create(profile)
+
+            sqsEventEmitter.sendEvent(profile.toString()).join()
 
             call.respondText("Profile Created", status = HttpStatusCode.OK)
         }

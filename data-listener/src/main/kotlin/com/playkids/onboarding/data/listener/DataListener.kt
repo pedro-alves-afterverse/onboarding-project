@@ -14,7 +14,7 @@ typealias MessageHandler = suspend (String) -> Unit
 class DataListener(
     val sqs: SqsAsyncClient
 ) {
-    private val queueUrl = "lala"
+    private val queueUrl = "https://sqs.us-east-1.amazonaws.com/027396584751/onboarding-pedro-data-transfer"
     private val maxNumberOfMessages = 5
 
     private lateinit var messageHandler: MessageHandler

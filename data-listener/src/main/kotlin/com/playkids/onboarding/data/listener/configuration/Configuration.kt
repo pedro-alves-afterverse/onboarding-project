@@ -12,17 +12,17 @@ object Configuration {
         .asyncCredentialUpdateEnabled(true)
         .build()
 
-    private val postgresDB = PostgreSQLConnectionBuilder.createConnectionPool(
-        ConnectionPoolConfiguration(
-            host = "localhost",
-            port = 5432,
-            database = "onboarding",
-            username = "postgres",
-            password = "postgres"
-        )
-    )
+//    private val postgresDB = PostgreSQLConnectionBuilder.createConnectionPool(
+//        ConnectionPoolConfiguration(
+//            host = "localhost",
+//            port = 5432,
+//            database = "onboarding",
+//            username = "postgres",
+//            password = "postgres"
+//        )
+//    )
 
-    private val persistenceModule = PersistenceModule(postgresDB)
+//    private val persistenceModule = PersistenceModule(postgresDB)
 
     private val sqsClient = SqsAsyncClient.builder()
         .credentialsProvider(credentialsProvider)

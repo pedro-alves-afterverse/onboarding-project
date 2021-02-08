@@ -1,6 +1,7 @@
 package com.playkids.onboarding.api.configuration
 
 import com.playkids.onboarding.api.OnboardingApi
+import com.playkids.onboarding.api.sqs.SQSEventEmitter
 import com.playkids.onboarding.core.service.ItemService
 import com.playkids.onboarding.core.service.ProfileService
 import com.playkids.onboarding.core.service.SKUService
@@ -8,6 +9,7 @@ import com.typesafe.config.ConfigFactory
 import software.amazon.awssdk.auth.credentials.DefaultCredentialsProvider
 import software.amazon.awssdk.regions.Region
 import software.amazon.awssdk.services.dynamodb.DynamoDbAsyncClient
+import software.amazon.awssdk.services.sqs.SqsAsyncClient
 
 object Configuration {
     private const val APPLICATION = "onboarding"
@@ -25,6 +27,13 @@ object Configuration {
         .credentialsProvider(credentialsProvider)
         .region(Region.US_EAST_1)
         .build()
+
+    private val sqsClient = SqsAsyncClient.builder()
+        .credentialsProvider(credentialsProvider)
+        .region(Region.US_EAST_1)
+        .build()
+
+    private val sqsEventEmitter = SQSEventEmitter(sqsClient)
 
     private val persistenceModule = PersistenceModule(
         config,
@@ -46,7 +55,8 @@ object Configuration {
         itemDAO = persistenceModule.itemDAO
     )
 
-    val server = OnboardingApi(serverPort, itemService, skuService, profileService)
+
+    val server = OnboardingApi(serverPort, itemService, skuService, profileService, sqsEventEmitter)
 
 
 }

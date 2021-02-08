@@ -6,4 +6,4 @@ dependencies {
     implementation "software.amazon.awssdk:sqs:$awsSDK2Version"
 }
 
-mainClassName = "com.playkids.onboarding.data.listener.MainKt"
+mainClassName = "com.playkids.onboarding.data.listener.ListenerMainKt"
