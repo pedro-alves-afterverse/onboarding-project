@@ -15,7 +15,7 @@ object Configuration {
     private val rootConfig = ConfigFactory.load()
     private val config = rootConfig.getConfig(APPLICATION)!!
 
-    val serverPort = config.getInt("server-port")
+    private val serverPort = config.getInt("server-port")
 
     private val credentialsProvider = DefaultCredentialsProvider.builder()
         .asyncCredentialUpdateEnabled(true)

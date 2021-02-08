@@ -3,9 +3,11 @@ plugins {
 }
 
 dependencies {
-    implementation "org.postgresql:postgresql:$postgresqlJDBCVersion"
-    api "org.flywaydb:flyway-core:$flywayVersion"
+    api project(":core")
 
+    implementation "org.postgresql:postgresql:$postgresqlJDBCVersion"
+    implementation "org.flywaydb:flyway-core:$flywayVersion"
+    api "com.github.jasync-sql:jasync-postgresql:$jasyncVersion"
 }
 
 flyway {

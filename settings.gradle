@@ -4,7 +4,8 @@ String[] modules = [
         'api',
         'dynamodb',
         'core',
-        'postgresql'
+        'postgresql',
+        'data-listener'
 ]
 
 include modules
