@@ -7,8 +7,8 @@ import com.movile.kotlin.commons.dynamodb.toAttributeValue
 import com.playkids.onboarding.core.model.Item
 import com.playkids.onboarding.core.model.ItemId
 import com.playkids.onboarding.core.persistence.ItemDAO
+import com.playkids.onboarding.core.util.ItemCurrencies
 import com.playkids.onboarding.dynamodb.extensions.itemOrNull
-import com.playkids.onboarding.dynamodb.extensions.itemsOrNull
 import com.typesafe.config.Config
 import software.amazon.awssdk.services.dynamodb.DynamoDbAsyncClient
 import software.amazon.awssdk.services.dynamodb.model.AttributeValue
@@ -56,8 +56,8 @@ class DynamoDBItemDAO(config: Config, private val dynamoDbClient: DynamoDbAsyncC
             CATEGORY to category.toAttributeValue(),
             ID to id.toAttributeValue(),
             IMAGE to image.toAttributeValue(),
-            COIN_PRICE to coinPrice.toAttributeValue(),
-            GEM_PRICE to gemPrice.toAttributeValue()
+            CURRENCY to currency.toString().toUpperCase().toAttributeValue(),
+            PRICE to price.toAttributeValue()
         )
 
     private fun Map<String, AttributeValue>.toItem(): Item =
@@ -65,8 +65,8 @@ class DynamoDBItemDAO(config: Config, private val dynamoDbClient: DynamoDbAsyncC
             category = string(CATEGORY)!!,
             id = string(ID)!!,
             image = string(IMAGE)!!,
-            coinPrice = int(COIN_PRICE),
-            gemPrice = int(GEM_PRICE)
+            currency = ItemCurrencies.valueOf(string(CURRENCY)!!),
+            price = int(PRICE)!!
         )
 
 
@@ -74,7 +74,7 @@ class DynamoDBItemDAO(config: Config, private val dynamoDbClient: DynamoDbAsyncC
         private const val ID = "id"
         private const val CATEGORY = "category"
         private const val IMAGE = "image"
-        private const val COIN_PRICE = "coinPrice"
-        private const val GEM_PRICE = "gemPrice"
+        private const val CURRENCY = "currency"
+        private const val PRICE = "price"
     }
 }

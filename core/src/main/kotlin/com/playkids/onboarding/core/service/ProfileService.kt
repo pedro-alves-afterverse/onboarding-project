@@ -1,7 +1,7 @@
 package com.playkids.onboarding.core.service
 
 import com.playkids.onboarding.core.excption.EntityNotFoundException
-import com.playkids.onboarding.core.excption.NotEnoughCurrency
+import com.playkids.onboarding.core.excption.NotEnoughCurrencyException
 import com.playkids.onboarding.core.excption.UserHasItemException
 import com.playkids.onboarding.core.model.ItemId
 import com.playkids.onboarding.core.model.Profile
@@ -10,7 +10,7 @@ import com.playkids.onboarding.core.model.SKUId
 import com.playkids.onboarding.core.persistence.ItemDAO
 import com.playkids.onboarding.core.persistence.ProfileDAO
 import com.playkids.onboarding.core.persistence.SKUDAO
-import com.playkids.onboarding.core.util.ChooseValue
+import com.playkids.onboarding.core.util.ProfileCurrencies
 
 class ProfileService(
     private val profileDAO: ProfileDAO,
@@ -29,36 +29,20 @@ class ProfileService(
         return profileDAO.addItem(profileId, listOf("$itemCategory:$itemId"))
     }
 
-    suspend fun buyItem(profileId: ProfileId, itemId: ItemId, itemCategory: String, currency: String){
+    suspend fun buyItem(profileId: ProfileId, itemId: ItemId, itemCategory: String){
         val item = itemDAO.find(itemCategory, itemId) ?: throw EntityNotFoundException("Item with id $itemId and category $itemCategory doesn't exists")
-        val price = when(currency){
-            COIN -> item.coinPrice
-            GEM -> item.gemPrice
-            else -> {
-                throw IllegalArgumentException("currency $currency doesn't exists")
-            }
-        } ?: throw IllegalArgumentException("Item doesn't have attribute $currency")
-        val projection = mapOf(
-            "#i" to "items",
-            "#c" to currency
-        )
-        val (profileItems, currencyAmount) = profileDAO.getItemsAndCurrency(profileId, projection, currency) ?: throw EntityNotFoundException("profile with id $profileId doesn't exists")
-        if (price > currencyAmount) throw NotEnoughCurrency("profile with id $profileId doesn't have enough $currency to buy item")
+        val (profileItems, currencyAmount) = profileDAO.getItemsAndCurrency(profileId, item.currency) ?: throw EntityNotFoundException("profile with id $profileId doesn't exists")
+        if (item.price > currencyAmount) throw NotEnoughCurrencyException("profile with id $profileId doesn't have enough ${item.currency} to buy item")
         if ("$itemCategory:$itemId" in profileItems) throw UserHasItemException("profile with id $profileId already has item of id $itemId")
-        profileDAO.updateCurrency(profileId, "-", currency, ChooseValue(price, null))
+        profileDAO.updateCurrency(profileId, item.currency, (-item.price))
         profileDAO.addItem(profileId, listOf("$itemCategory:$itemId"))
     }
 
     suspend fun addSku(profileId: ProfileId, skuId: SKUId){
         val sku = skuDAO.find(skuId) ?: throw EntityNotFoundException("SKU with id $skuId doesn't exists")
         //{CHAMADA DE API PARA VERIFICAR A COMPRA}
-        profileDAO.updateCurrency(profileId, "+", "coin", ChooseValue(sku.coin, null))
-        profileDAO.updateCurrency(profileId, "+", "gem", ChooseValue(sku.gem, null))
-        profileDAO.updateCurrency(profileId, operation = "+", currency = "moneySpent", ChooseValue(null, sku.price))
-    }
-
-    companion object {
-        private const val COIN = "coin"
-        private const val GEM = "gem"
+        profileDAO.updateCurrency(profileId, ProfileCurrencies.COIN, sku.coin)
+        profileDAO.updateCurrency(profileId, ProfileCurrencies.GEM, sku.gem)
+        profileDAO.updateCurrency(profileId, ProfileCurrencies.MONEY, sku.price)
     }
 }
