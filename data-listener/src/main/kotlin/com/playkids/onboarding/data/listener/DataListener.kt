@@ -36,14 +36,14 @@ class DataListener(
                 .messages()
                 .forEach {
                     messageHandler.handle(it.body(), it.messageAttributes().mapValues { entry -> entry.value.stringValue() })
-//                sqs.deleteMessage(
-//                    DeleteMessageRequest.builder()
-//                        .queueUrl(queueUrl)
-//                        .receiptHandle(it.receiptHandle())
-//                        .build()
-//
-//                )
-//                    .await()
+                    sqs.deleteMessage(
+                        DeleteMessageRequest.builder()
+                            .queueUrl(queueUrl)
+                            .receiptHandle(it.receiptHandle())
+                            .build()
+
+                    )
+                        .await()
             }
         } while (isRunning.get())
     }

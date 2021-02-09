@@ -12,4 +12,5 @@
     <logger name="aws.java" level="warning"/>
     <logger name="aws.sdk" level="warning"/>
     <logger name="aws" level="warning"/>
+    <logger name="db.sql" level="warning"/>
 </configuration>

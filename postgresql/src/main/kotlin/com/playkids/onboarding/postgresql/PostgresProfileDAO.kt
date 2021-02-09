@@ -4,8 +4,8 @@ import com.github.jasync.sql.db.Connection
 import com.playkids.onboarding.core.model.Profile
 import com.playkids.onboarding.core.model.ProfileId
 import com.playkids.onboarding.core.persistence.ProfileDAO
-import com.playkids.onboarding.core.util.ChooseValue
-import com.playkids.onboarding.core.util.ItemsCurrency
+import com.playkids.onboarding.core.util.Currencies
+import com.playkids.onboarding.core.util.camelToSnakeCase
 import com.playkids.onboarding.postgresql.extensions.query
 import kotlinx.coroutines.future.await
 import javax.naming.OperationNotSupportedException
@@ -23,62 +23,30 @@ class PostgresProfileDAO(private val db: Connection): ProfileDAO {
         ).await()
     }
 
-    override suspend fun updateCurrency(
-        profileId: ProfileId,
-        operation: String,
-        currency: String,
-        chooseValue: ChooseValue
-    ) {
-//        db.query(
-//            UPDATE_MONEY_QUERY,
-//            coin,
-//            gem,
-//            moneySpent,
-//            profileId
-//        ).await()
-    }
-
-    override suspend fun find(id: ProfileId): Profile? {
-        throw OperationNotSupportedException("Operação não suportada")
-    }
-
-    override suspend fun getItemsAndCurrency(
-        id: ProfileId,
-        projection: Map<String, String>,
-        currency: String
-    ): ItemsCurrency? {
-        throw OperationNotSupportedException("Operação não suportada")
-    }
-
-    override suspend fun addItem(profileId: ProfileId, item: List<String>) {
-        throw OperationNotSupportedException("Operação não suportada")
-    }
-
-    override suspend fun getProfileItems(id: ProfileId, projection: Map<String, String>): List<String>? {
-        throw OperationNotSupportedException("Operação não suportada")
-    }
-
-    suspend fun insert(profile: Profile) {
+    override suspend fun updateCurrency(profileId: ProfileId, currency: Currencies, value: Number) {
         db.query(
-            INSERT_QUERY,
-            profile.id,
-            profile.username,
-            profile.coin,
-            profile.gem,
-            profile.moneySpent,
-            profile.region
-        ).await()
-    }
-
-    suspend fun update(profileId: ProfileId, coin: Int, gem: Int, moneySpent: Float) {
-        db.query(
-            UPDATE_MONEY_QUERY,
-            coin,
-            gem,
-            moneySpent,
+            UPDATE_CURRENCY_QUERY.replace("COLUMN", currency.toString().camelToSnakeCase()),
+            value,
             profileId
         ).await()
     }
+
+    override suspend fun find(id: ProfileId): Profile? {
+        throw OperationNotSupportedException("Operation not supported")
+    }
+
+    override suspend fun getItemsAndCurrency(id: ProfileId, currency: Currencies): Pair<List<String>, Int>? {
+        throw OperationNotSupportedException("Operation not supported")
+    }
+
+    override suspend fun addItem(profileId: ProfileId, item: List<String>) {
+        throw OperationNotSupportedException("Operation not supported")
+    }
+
+    override suspend fun getProfileItems(id: ProfileId, projection: Map<String, String>): List<String>? {
+        throw OperationNotSupportedException("Operation not supported")
+    }
+
 
     companion object {
         private const val ID = "id"
@@ -104,9 +72,9 @@ class PostgresProfileDAO(private val db: Connection): ProfileDAO {
             VALUES (?, ?, ?, ?, ?, ?)
         """.trimIndent()
 
-        val UPDATE_MONEY_QUERY = """
+        val UPDATE_CURRENCY_QUERY = """
             UPDATE $TABLE_NAME
-            SET $COIN = $COIN + ?, $GEM = $GEM + ?, $MONEY_SPENT = $MONEY_SPENT + ?
+            SET COLUMN = COLUMN + ?
             WHERE $ID = ?
         """.trimIndent()
     }

@@ -1,5 +1,6 @@
 package com.playkids.onboarding.core.service
 
+import com.playkids.onboarding.core.dto.UpdateCurrencyDTO
 import com.playkids.onboarding.core.excption.EntityNotFoundException
 import com.playkids.onboarding.core.excption.NotEnoughCurrencyException
 import com.playkids.onboarding.core.excption.UserHasItemException
@@ -10,6 +11,7 @@ import com.playkids.onboarding.core.model.SKUId
 import com.playkids.onboarding.core.persistence.ItemDAO
 import com.playkids.onboarding.core.persistence.ProfileDAO
 import com.playkids.onboarding.core.persistence.SKUDAO
+import com.playkids.onboarding.core.util.ItemCurrencies
 import com.playkids.onboarding.core.util.ProfileCurrencies
 
 class ProfileService(
@@ -29,20 +31,27 @@ class ProfileService(
         return profileDAO.addItem(profileId, listOf("$itemCategory:$itemId"))
     }
 
-    suspend fun buyItem(profileId: ProfileId, itemId: ItemId, itemCategory: String){
+    suspend fun buyItem(profileId: ProfileId, itemId: ItemId, itemCategory: String): UpdateCurrencyDTO{
         val item = itemDAO.find(itemCategory, itemId) ?: throw EntityNotFoundException("Item with id $itemId and category $itemCategory doesn't exists")
         val (profileItems, currencyAmount) = profileDAO.getItemsAndCurrency(profileId, item.currency) ?: throw EntityNotFoundException("profile with id $profileId doesn't exists")
         if (item.price > currencyAmount) throw NotEnoughCurrencyException("profile with id $profileId doesn't have enough ${item.currency} to buy item")
         if ("$itemCategory:$itemId" in profileItems) throw UserHasItemException("profile with id $profileId already has item of id $itemId")
         profileDAO.updateCurrency(profileId, item.currency, (-item.price))
         profileDAO.addItem(profileId, listOf("$itemCategory:$itemId"))
+
+        return when(item.currency){
+            ItemCurrencies.COIN -> UpdateCurrencyDTO(profileId = profileId, coin = (-item.price))
+            ItemCurrencies.GEM -> UpdateCurrencyDTO(profileId = profileId, gem = (-item.price))
+        }
     }
 
-    suspend fun addSku(profileId: ProfileId, skuId: SKUId){
+    suspend fun addSku(profileId: ProfileId, skuId: SKUId): UpdateCurrencyDTO{
         val sku = skuDAO.find(skuId) ?: throw EntityNotFoundException("SKU with id $skuId doesn't exists")
-        //{CHAMADA DE API PARA VERIFICAR A COMPRA}
+        //{API CALL TO VERIFY PURCHASE}
         profileDAO.updateCurrency(profileId, ProfileCurrencies.COIN, sku.coin)
         profileDAO.updateCurrency(profileId, ProfileCurrencies.GEM, sku.gem)
         profileDAO.updateCurrency(profileId, ProfileCurrencies.MONEY, sku.price)
+
+        return UpdateCurrencyDTO(profileId, sku.coin, sku.gem, sku.price)
     }
 }

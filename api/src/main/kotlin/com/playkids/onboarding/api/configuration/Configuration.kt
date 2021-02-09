@@ -2,6 +2,7 @@ package com.playkids.onboarding.api.configuration
 
 import com.playkids.onboarding.api.OnboardingApi
 import com.playkids.onboarding.api.sqs.SQSEventEmitter
+import com.playkids.onboarding.api.sqs.handler.SQSProfileHandler
 import com.playkids.onboarding.core.service.ItemService
 import com.playkids.onboarding.core.service.ProfileService
 import com.playkids.onboarding.core.service.SKUService
@@ -38,6 +39,8 @@ object Configuration {
         "https://sqs.us-east-1.amazonaws.com/027396584751/onboarding-pedro-data-transfer"
     )
 
+    private val sqsProfileHandler = SQSProfileHandler(sqsEventEmitter)
+
     private val persistenceModule = PersistenceModule(
         config,
         dynamoDBClient
@@ -59,7 +62,7 @@ object Configuration {
     )
 
 
-    val server = OnboardingApi(serverPort, itemService, skuService, profileService, sqsEventEmitter)
+    val server = OnboardingApi(serverPort, itemService, skuService, profileService, sqsProfileHandler)
 
 
 }
