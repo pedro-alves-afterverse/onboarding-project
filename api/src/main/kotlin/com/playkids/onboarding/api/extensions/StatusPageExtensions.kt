@@ -33,7 +33,7 @@ fun StatusPages.Configuration.exceptions(logger: Logger) {
     exception<UserHasItemException> {
         logger.warn("Failed to process request {}: {}", call.request.toLogString(), it.message, it)
 
-        call.respond(HttpStatusCode.NotFound, ErrorResponse(HttpStatusCode.Conflict, it.message ?: ""))
+        call.respond(HttpStatusCode.Conflict, ErrorResponse(HttpStatusCode.Conflict, it.message ?: ""))
     }
 
     exception<IllegalArgumentException> {
