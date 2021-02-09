@@ -33,7 +33,10 @@ object Configuration {
         .region(Region.US_EAST_1)
         .build()
 
-    private val sqsEventEmitter = SQSEventEmitter(sqsClient)
+    private val sqsEventEmitter = SQSEventEmitter(
+        sqsClient,
+        "https://sqs.us-east-1.amazonaws.com/027396584751/onboarding-pedro-data-transfer"
+    )
 
     private val persistenceModule = PersistenceModule(
         config,

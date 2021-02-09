@@ -2,6 +2,7 @@ package com.playkids.onboarding.api.route
 
 import com.movile.kotlin.commons.ktor.patch
 import com.movile.kotlin.commons.ktor.post
+import com.movile.kotlin.commons.serialization.toJson
 import com.playkids.onboarding.api.dto.AddItemDTO
 import com.playkids.onboarding.api.dto.AddSkuDTO
 import com.playkids.onboarding.api.dto.BuyItemDTO
@@ -35,7 +36,12 @@ fun Route.profileRouting(
         post<Profile> { profile ->
             profileService.create(profile)
 
-            sqsEventEmitter.sendEvent(profile.toString()).join()
+            val sqsAttributes = mapOf(
+                "entity" to "Profile",
+                "operation" to "insert"
+            )
+
+            sqsEventEmitter.sendEvent(profile.toJson().get(), sqsAttributes).join()
 
             call.respondText("Profile Created", status = HttpStatusCode.OK)
         }

@@ -3,7 +3,7 @@ apply plugin: 'application'
 dependencies {
     implementation project(":postgresql")
 
-    implementation "software.amazon.awssdk:sqs:$awsSDK2Version"
+    implementation project(":sqs")
 }
 
 mainClassName = "com.playkids.onboarding.data.listener.ListenerMainKt"

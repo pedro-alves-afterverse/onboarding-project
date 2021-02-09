@@ -29,6 +29,10 @@ object Configuration {
         .region(Region.US_EAST_1)
         .build()
 
-    val dataListener = DataListener(sqsClient)
+    val dataListener = DataListener(
+        sqs = sqsClient,
+        queueUrl = "https://sqs.us-east-1.amazonaws.com/027396584751/onboarding-pedro-data-transfer",
+        maxNumberOfMessages = 5
+    )
 
 }
