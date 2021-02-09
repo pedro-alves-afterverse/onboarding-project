@@ -1,6 +1,6 @@
 package com.playkids.onboarding.data.listener
 
-import com.playkids.onboarding.sqs.MessageHandler
+import com.playkids.onboarding.sqs.SQSHandler
 import com.playkids.onboarding.sqs.SQSListener
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.Job
@@ -14,10 +14,9 @@ import java.util.concurrent.atomic.AtomicBoolean
 class DataListener(
     private val sqs: SqsAsyncClient,
     private val queueUrl: String,
-    private val maxNumberOfMessages: Int
+    private val maxNumberOfMessages: Int,
+    private val messageHandler: SQSHandler
 ): SQSListener {
-
-    private lateinit var messageHandler: MessageHandler
 
     private val isRunning = AtomicBoolean(false)
 
@@ -36,7 +35,7 @@ class DataListener(
                 .await()
                 .messages()
                 .forEach {
-                    messageHandler(it.body(), it.messageAttributes().mapValues { entry -> entry.value.stringValue() })
+                    messageHandler.handle(it.body(), it.messageAttributes().mapValues { entry -> entry.value.stringValue() })
 //                sqs.deleteMessage(
 //                    DeleteMessageRequest.builder()
 //                        .queueUrl(queueUrl)
@@ -49,7 +48,4 @@ class DataListener(
         } while (isRunning.get())
     }
 
-    override fun onMessageReceived(messageHandler: MessageHandler){
-        this.messageHandler = messageHandler
-    }
 }

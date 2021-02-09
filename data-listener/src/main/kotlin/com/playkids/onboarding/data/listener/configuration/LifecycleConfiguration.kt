@@ -8,7 +8,6 @@ object LifecycleConfiguration {
 
     suspend fun start() {
         registerShutdownHook()
-        dataListener.onMessageReceived(SQSEventHandler::handle)
         dataListener.start().join()
     }
 

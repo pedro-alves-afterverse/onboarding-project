@@ -2,10 +2,17 @@ package com.playkids.onboarding.data.listener.handler
 
 import com.movile.kotlin.commons.serialization.fromJson
 import com.playkids.onboarding.core.model.Profile
+import com.playkids.onboarding.postgresql.PostgresProfileDAO
 import com.playkids.onboarding.sqs.SQSHandler
 
-object SQSEventHandler: SQSHandler {
+class SQSEventHandler(
+    val profileHandler: HandleProfile
+): SQSHandler {
     override fun handle(message: String, attributes: Map<String, String>) {
+
+        when(attributes.getValue("entity")){
+            "Profile" -> profileHandler.handle(message, attributes.getValue("operation"))
+        }
         val profile = message.fromJson<Profile>().get()
 
         println(profile.username)
@@ -21,4 +28,12 @@ object SQSEventHandler: SQSHandler {
         }
 
     }
+
+//    private fun handleProfile(profile: Profile, operation: String){
+//        when(operation){
+//            "insert"
+//        }
+//    }
+
+
 }
