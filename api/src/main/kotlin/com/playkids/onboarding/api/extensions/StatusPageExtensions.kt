@@ -27,7 +27,7 @@ fun StatusPages.Configuration.exceptions(logger: Logger) {
     exception<NotEnoughCurrency> {
         logger.warn("Failed to process request {}: {}", call.request.toLogString(), it.message, it)
 
-        call.respond(HttpStatusCode.NotFound, ErrorResponse(HttpStatusCode.PreconditionFailed, it.message ?: ""))
+        call.respond(HttpStatusCode.PreconditionFailed, ErrorResponse(HttpStatusCode.PreconditionFailed, it.message ?: ""))
     }
 
     exception<UserHasItemException> {
