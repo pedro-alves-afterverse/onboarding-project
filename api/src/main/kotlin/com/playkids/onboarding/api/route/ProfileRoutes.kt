@@ -55,7 +55,7 @@ fun Route.profileRouting(profileService: ProfileService) {
             patch<BuyItemDTO>("/item/{id}") {item ->
                 val id = id()
 
-                profileService.buyItem(id, item.id, item.category, item.currency)
+                profileService.buyItem(id, item.id, item.category)
 
                 call.respondText("Item bought successfully", status = HttpStatusCode.OK)
 

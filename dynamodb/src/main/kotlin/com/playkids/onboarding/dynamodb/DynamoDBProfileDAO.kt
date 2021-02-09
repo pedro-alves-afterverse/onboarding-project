@@ -1,13 +1,9 @@
 package com.playkids.onboarding.dynamodb
 
 import com.movile.kotlin.commons.dynamodb.*
-import com.playkids.onboarding.core.model.Item
-import com.playkids.onboarding.core.model.ItemId
-import com.playkids.onboarding.core.model.Profile
-import com.playkids.onboarding.core.model.ProfileId
+import com.playkids.onboarding.core.model.*
 import com.playkids.onboarding.core.persistence.ProfileDAO
-import com.playkids.onboarding.core.util.ChooseValue
-import com.playkids.onboarding.core.util.ItemsCurrency
+import com.playkids.onboarding.core.util.Currencies
 import com.playkids.onboarding.dynamodb.extensions.itemOrNull
 import com.playkids.onboarding.dynamodb.extensions.listOfString
 import com.playkids.onboarding.dynamodb.extensions.toListAttributeValue
@@ -31,8 +27,14 @@ class DynamoDBProfileDAO(config: Config, private val dynamoDbClient: DynamoDbAsy
     override suspend fun find(id: ProfileId): Profile? =
         this.query(id)?.toProfile()
 
-    override suspend fun getItemsAndCurrency(id: ProfileId, projection: Map<String, String>, currency: String): ItemsCurrency? =
-        this.query(id, projection)?.toItemsCurrency(currency)
+    override suspend fun getItemsAndCurrency(id: ProfileId, currency: Currencies): Pair<List<String>, Int>? {
+        val projection = mapOf(
+            "#i" to "items",
+            "#c" to currency.toString()
+        )
+        return this.query(id, projection)?.toItemsCurrency(currency.toString())
+    }
+
     override suspend fun addItem(profileId: ProfileId, item: List<ItemId>) {
         dynamoDbClient.updateItem(
             UpdateItemRequest.builder()
@@ -46,14 +48,14 @@ class DynamoDBProfileDAO(config: Config, private val dynamoDbClient: DynamoDbAsy
             .awaitRaiseException()
     }
 
-    override suspend fun updateCurrency(profileId: ProfileId, operation: String, currency: String, chooseValue: ChooseValue) {
+    override suspend fun updateCurrency(profileId: ProfileId, currency: Currencies, value: Number) {
         dynamoDbClient.updateItem(
             UpdateItemRequest.builder()
                 .tableName(tableName)
                 .key(mapOf(ID to profileId.toAttributeValue()))
-                .updateExpression("SET #currency = #currency $operation :v")
-                .expressionAttributeNames(mapOf("#currency" to currency))
-                .expressionAttributeValues(mapOf(":v" to chooseValue.chooseToAttributeValue()))
+                .updateExpression("SET #currency = #currency + :v")
+                .expressionAttributeNames(mapOf("#currency" to currency.toString()))
+                .expressionAttributeValues(mapOf(":v" to value.toAttributeValue()))
                 .build()
         )
             .awaitRaiseException()
@@ -98,8 +100,8 @@ class DynamoDBProfileDAO(config: Config, private val dynamoDbClient: DynamoDbAsy
         )
 
 
-    private fun Map<String, AttributeValue>.toItemsCurrency(currency: String): ItemsCurrency =
-        ItemsCurrency(listOfString(ITEMS)!!, int(currency)!!)
+    private fun Map<String, AttributeValue>.toItemsCurrency(currency: String): Pair<List<String>, Int> =
+        listOfString(ITEMS)!! to int(currency)!!
 
     private fun Map<String, AttributeValue>.toItemList(): List<String>? =
         listOfString(ITEMS)
