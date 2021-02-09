@@ -33,9 +33,6 @@ class DynamoDBProfileDAO(config: Config, private val dynamoDbClient: DynamoDbAsy
 
     override suspend fun getItemsAndCurrency(id: ProfileId, projection: Map<String, String>, currency: String): ItemsCurrency? =
         this.query(id, projection)?.toItemsCurrency(currency)
-
-
-
     override suspend fun addItem(profileId: ProfileId, item: List<ItemId>) {
         dynamoDbClient.updateItem(
             UpdateItemRequest.builder()
