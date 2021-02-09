@@ -8,26 +8,19 @@ import com.playkids.onboarding.core.util.ChooseValue
 import com.playkids.onboarding.core.util.ItemsCurrency
 import com.playkids.onboarding.postgresql.extensions.query
 import kotlinx.coroutines.future.await
+import javax.naming.OperationNotSupportedException
 
 class PostgresProfileDAO(private val db: Connection): ProfileDAO {
     override suspend fun create(profile: Profile) {
-        TODO("Not yet implemented")
-    }
-
-    override suspend fun find(id: ProfileId): Profile? {
-        TODO("Not yet implemented")
-    }
-
-    override suspend fun getItemsAndCurrency(
-        id: ProfileId,
-        projection: Map<String, String>,
-        currency: String
-    ): ItemsCurrency? {
-        TODO("Not yet implemented")
-    }
-
-    override suspend fun addItem(profileId: ProfileId, item: List<String>) {
-        TODO("Not yet implemented")
+        db.query(
+            INSERT_QUERY,
+            profile.id,
+            profile.username,
+            profile.coin,
+            profile.gem,
+            profile.moneySpent,
+            profile.region
+        ).await()
     }
 
     override suspend fun updateCurrency(
@@ -36,11 +29,33 @@ class PostgresProfileDAO(private val db: Connection): ProfileDAO {
         currency: String,
         chooseValue: ChooseValue
     ) {
-        TODO("Not yet implemented")
+//        db.query(
+//            UPDATE_MONEY_QUERY,
+//            coin,
+//            gem,
+//            moneySpent,
+//            profileId
+//        ).await()
+    }
+
+    override suspend fun find(id: ProfileId): Profile? {
+        throw OperationNotSupportedException("Operação não suportada")
+    }
+
+    override suspend fun getItemsAndCurrency(
+        id: ProfileId,
+        projection: Map<String, String>,
+        currency: String
+    ): ItemsCurrency? {
+        throw OperationNotSupportedException("Operação não suportada")
+    }
+
+    override suspend fun addItem(profileId: ProfileId, item: List<String>) {
+        throw OperationNotSupportedException("Operação não suportada")
     }
 
     override suspend fun getProfileItems(id: ProfileId, projection: Map<String, String>): List<String>? {
-        TODO("Not yet implemented")
+        throw OperationNotSupportedException("Operação não suportada")
     }
 
     suspend fun insert(profile: Profile) {
