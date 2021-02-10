@@ -4,10 +4,7 @@ import com.playkids.onboarding.core.dto.UpdateCurrencyDTO
 import com.playkids.onboarding.core.excption.EntityNotFoundException
 import com.playkids.onboarding.core.excption.NotEnoughCurrencyException
 import com.playkids.onboarding.core.excption.UserHasItemException
-import com.playkids.onboarding.core.model.ItemId
-import com.playkids.onboarding.core.model.Profile
-import com.playkids.onboarding.core.model.ProfileId
-import com.playkids.onboarding.core.model.SKUId
+import com.playkids.onboarding.core.model.*
 import com.playkids.onboarding.core.persistence.ItemDAO
 import com.playkids.onboarding.core.persistence.ProfileDAO
 import com.playkids.onboarding.core.persistence.SKUDAO
@@ -33,9 +30,10 @@ class ProfileService(
 
     suspend fun buyItem(profileId: ProfileId, itemId: ItemId, itemCategory: String): UpdateCurrencyDTO{
         val item = itemDAO.find(itemCategory, itemId) ?: throw EntityNotFoundException("Item with id $itemId and category $itemCategory doesn't exists")
+        val itemKey = ItemKey.fromItem(item)
         val (profileItems, currencyAmount) = profileDAO.getItemsAndCurrency(profileId, item.currency) ?: throw EntityNotFoundException("profile with id $profileId doesn't exists")
         if (item.price > currencyAmount) throw NotEnoughCurrencyException("profile with id $profileId doesn't have enough ${item.currency} to buy item")
-        if ("$itemCategory:$itemId" in profileItems) throw UserHasItemException("profile with id $profileId already has item of id $itemId")
+        if (itemKey.getKey() in profileItems.map { it.getKey() }) throw UserHasItemException("profile with id $profileId already has item of id $itemId")
         profileDAO.updateCurrency(profileId, item.currency, (-item.price))
         profileDAO.addItem(profileId, listOf("$itemCategory:$itemId"))
 
