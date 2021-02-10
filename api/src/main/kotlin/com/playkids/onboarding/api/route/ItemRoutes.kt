@@ -40,6 +40,14 @@ fun Route.itemRouting(itemService: ItemService) {
 
             call.respond(item)
         }
+        get("/{category}/user/{id}") {
+            val id = id()
+            val category = category()
+
+            val items = itemService.findAllByCategoryForUser(category, id) ?: throw NotFoundException("No items found")
+
+            call.respond(items)
+        }
         post<Item> { item ->
             itemService.create(item)
 

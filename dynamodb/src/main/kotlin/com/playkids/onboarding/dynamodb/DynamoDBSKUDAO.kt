@@ -44,7 +44,7 @@ class DynamoDBSKUDAO(config: Config, private val dynamoDbClient: DynamoDbAsyncCl
             id = string(ID)!!,
             gem = int(GEM)!!,
             coin = int(COIN)!!,
-            price = float(COIN)!!
+            price = float(PRICE)!!
         )
 
     companion object {
