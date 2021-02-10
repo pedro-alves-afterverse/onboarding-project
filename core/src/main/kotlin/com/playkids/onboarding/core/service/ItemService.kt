@@ -24,9 +24,8 @@ class ItemService(
     }
 
     suspend fun findAllByCategoryForUser(category: String, profileId: ProfileId): List<Item>? {
-        val projection = mapOf("#i" to "items")
-        val profileItems = profileDAO.getProfileItems(profileId, projection) ?: throw EntityNotFoundException("No profile with id $profileId")
+        val profileItems = profileDAO.getProfileItems(profileId) ?: throw EntityNotFoundException("No profile with id $profileId")
         val items = itemDAO.findAllByCategory(category)
-        return items?.filter { "${it.category}:${it.id}" !in profileItems }
+        return items?.filter { "${it.category}:${it.id}" !in profileItems.map { p -> p.getKey() } }
     }
 }

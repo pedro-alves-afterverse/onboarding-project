@@ -56,7 +56,7 @@ class DynamoDBItemDAO(config: Config, private val dynamoDbClient: DynamoDbAsyncC
             CATEGORY to category.toAttributeValue(),
             ID to id.toAttributeValue(),
             IMAGE to image.toAttributeValue(),
-currency.name.toAttributeValue()
+            CURRENCY to currency.name.toAttributeValue(),
             PRICE to price.toAttributeValue()
         )
 

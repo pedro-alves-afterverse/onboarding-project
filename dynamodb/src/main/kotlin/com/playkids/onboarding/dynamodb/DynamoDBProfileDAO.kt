@@ -4,9 +4,7 @@ import com.movile.kotlin.commons.dynamodb.*
 import com.playkids.onboarding.core.model.*
 import com.playkids.onboarding.core.persistence.ProfileDAO
 import com.playkids.onboarding.core.util.Currencies
-import com.playkids.onboarding.dynamodb.extensions.itemOrNull
-import com.playkids.onboarding.dynamodb.extensions.listOfString
-import com.playkids.onboarding.dynamodb.extensions.toListAttributeValue
+import com.playkids.onboarding.dynamodb.extensions.*
 import com.typesafe.config.Config
 import software.amazon.awssdk.services.dynamodb.DynamoDbAsyncClient
 import software.amazon.awssdk.services.dynamodb.model.AttributeValue
@@ -27,7 +25,7 @@ class DynamoDBProfileDAO(config: Config, private val dynamoDbClient: DynamoDbAsy
     override suspend fun find(id: ProfileId): Profile? =
         this.query(id)?.toProfile()
 
-    override suspend fun getItemsAndCurrency(id: ProfileId, currency: Currencies): Pair<List<String>, Int>? {
+    override suspend fun getItemsAndCurrency(id: ProfileId, currency: Currencies): Pair<List<ItemKey>, Int>? {
         val projection = mapOf(
             "#i" to "items",
             "#c" to currency.toString()
@@ -61,8 +59,10 @@ class DynamoDBProfileDAO(config: Config, private val dynamoDbClient: DynamoDbAsy
             .awaitRaiseException()
     }
 
-    override suspend fun getProfileItems(id: ProfileId, projection: Map<String, String>): List<String>? =
-        this.query(id, projection)?.toItemList()
+    override suspend fun getProfileItems(id: ProfileId): List<ItemKey>? {
+        val projection = mapOf("#i" to "items")
+        return this.query(id, projection)?.toItemList()
+    }
 
 
     private suspend fun query(id: ProfileId, projection: Map<String, String>? = null) =
@@ -100,11 +100,11 @@ class DynamoDBProfileDAO(config: Config, private val dynamoDbClient: DynamoDbAsy
         )
 
 
-    private fun Map<String, AttributeValue>.toItemsCurrency(currency: String): Pair<List<String>, Int> =
-        listOfString(ITEMS)!! to int(currency)!!
+    private fun Map<String, AttributeValue>.toItemsCurrency(currency: String): Pair<List<ItemKey>, Int> =
+        listOfItemKey(ITEMS)!! to int(currency)!!
 
-    private fun Map<String, AttributeValue>.toItemList(): List<String>? =
-        listOfString(ITEMS)
+    private fun Map<String, AttributeValue>.toItemList(): List<ItemKey>? =
+        listOfItemKey(ITEMS)
 
     companion object {
         private const val ID = "id"
