@@ -1,6 +1,7 @@
 package com.playkids.onboarding.postgresql
 
 import com.github.jasync.sql.db.Connection
+import com.playkids.onboarding.core.model.ItemKey
 import com.playkids.onboarding.core.model.Profile
 import com.playkids.onboarding.core.model.ProfileId
 import com.playkids.onboarding.core.persistence.ProfileDAO
@@ -31,19 +32,20 @@ class PostgresProfileDAO(private val db: Connection): ProfileDAO {
         ).await()
     }
 
+    override suspend fun getProfileItems(id: ProfileId): List<ItemKey>? {
+        throw OperationNotSupportedException("Operation not supported")
+    }
+
     override suspend fun find(id: ProfileId): Profile? {
         throw OperationNotSupportedException("Operation not supported")
     }
 
-    override suspend fun getItemsAndCurrency(id: ProfileId, currency: Currencies): Pair<List<String>, Int>? {
+    override suspend fun getItemsAndCurrency(id: ProfileId, currency: Currencies): Pair<List<ItemKey>, Int>? {
         throw OperationNotSupportedException("Operation not supported")
     }
+
 
     override suspend fun addItem(profileId: ProfileId, item: List<String>) {
-        throw OperationNotSupportedException("Operation not supported")
-    }
-
-    override suspend fun getProfileItems(id: ProfileId, projection: Map<String, String>): List<String>? {
         throw OperationNotSupportedException("Operation not supported")
     }
 

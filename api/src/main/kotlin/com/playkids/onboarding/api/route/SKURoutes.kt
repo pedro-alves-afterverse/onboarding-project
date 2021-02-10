@@ -1,6 +1,7 @@
 package com.playkids.onboarding.api.route
 
 import com.movile.kotlin.commons.ktor.post
+import com.playkids.onboarding.core.dto.CreateSkuDTO
 import com.playkids.onboarding.core.model.Item
 import com.playkids.onboarding.core.model.SKU
 import com.playkids.onboarding.core.service.ItemService
@@ -26,10 +27,10 @@ fun Route.skuRouting(skuService: SKUService) {
 
             call.respond(sku)
         }
-        post<SKU> { sku ->
-            skuService.create(sku)
+        post<CreateSkuDTO> { skuDTO ->
+            val sku = skuService.create(skuDTO)
 
-            call.respondText("SKU Created", status = HttpStatusCode.OK)
+            call.respond(sku)
         }
     }
 }

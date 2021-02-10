@@ -1,7 +1,7 @@
 CREATE TABLE ITEMS_PROFILE
 (
-    profile_id      VARCHAR(32) NOT NULL UNIQUE,
-    item_id        VARCHAR(32) NOT NULL UNIQUE,
+    profile_id      VARCHAR(40) NOT NULL UNIQUE,
+    item_id        VARCHAR(40) NOT NULL UNIQUE,
 
     PRIMARY KEY (profile_id, item_id),
     CONSTRAINT fk_profile

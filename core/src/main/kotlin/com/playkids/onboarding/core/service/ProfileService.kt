@@ -1,5 +1,6 @@
 package com.playkids.onboarding.core.service
 
+import com.playkids.onboarding.core.dto.CreateProfileDTO
 import com.playkids.onboarding.core.dto.UpdateCurrencyDTO
 import com.playkids.onboarding.core.excption.EntityNotFoundException
 import com.playkids.onboarding.core.excption.NotEnoughCurrencyException
@@ -16,8 +17,10 @@ class ProfileService(
     private val skuDAO: SKUDAO,
     private val itemDAO: ItemDAO
 ) {
-    suspend fun create(profile: Profile){
+    suspend fun create(profileDTO: CreateProfileDTO): Profile {
+        val profile = Profile.baseProfileFactory(profileDTO)
         profileDAO.create(profile)
+        return profile
     }
 
     suspend fun find(id: ProfileId): Profile?{

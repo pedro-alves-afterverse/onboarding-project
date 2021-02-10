@@ -8,6 +8,7 @@ import com.playkids.onboarding.api.dto.AddSkuDTO
 import com.playkids.onboarding.api.dto.BuyItemDTO
 import com.playkids.onboarding.api.sqs.SQSEventEmitter
 import com.playkids.onboarding.api.sqs.handler.SQSProfileHandler
+import com.playkids.onboarding.core.dto.CreateProfileDTO
 import com.playkids.onboarding.core.model.Profile
 import com.playkids.onboarding.core.service.ProfileService
 import io.ktor.application.*
@@ -34,12 +35,12 @@ fun Route.profileRouting(
 
             call.respond(profile)
         }
-        post<Profile> { profile ->
-            profileService.create(profile)
+        post<CreateProfileDTO> { profileDTO ->
+            val profile = profileService.create(profileDTO)
 
             sqsHandler.handleInsert(profile)
 
-            call.respondText("Profile Created", status = HttpStatusCode.OK)
+            call.respond(profile)
         }
         route("/add"){
             patch<AddItemDTO>("/item/{id}") {item ->

@@ -1,6 +1,8 @@
 package com.playkids.onboarding.core.model
 
+import com.playkids.onboarding.core.dto.CreateItemDTO
 import com.playkids.onboarding.core.util.ItemCurrencies
+import java.util.*
 
 typealias ItemId = String
 
@@ -10,7 +12,19 @@ data class Item(
     val image: String,
     val currency: ItemCurrencies,
     val price: Int
-)
+){
+    companion object{
+        fun itemFactory(itemDTO: CreateItemDTO): Item{
+            return Item(
+                id = UUID.randomUUID().toString(),
+                category = itemDTO.category,
+                image = itemDTO.image,
+                currency = itemDTO.currency,
+                price = itemDTO.price
+            )
+        }
+    }
+}
 
 data class ItemKey(
     private val category: String,

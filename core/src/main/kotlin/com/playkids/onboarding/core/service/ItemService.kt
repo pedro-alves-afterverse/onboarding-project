@@ -1,5 +1,6 @@
 package com.playkids.onboarding.core.service
 
+import com.playkids.onboarding.core.dto.CreateItemDTO
 import com.playkids.onboarding.core.excption.EntityNotFoundException
 import com.playkids.onboarding.core.model.Item
 import com.playkids.onboarding.core.model.ItemId
@@ -11,8 +12,10 @@ class ItemService(
     private val itemDAO: ItemDAO,
     private val profileDAO: ProfileDAO
 ) {
-    suspend fun create(item: Item){
+    suspend fun create(itemDTO: CreateItemDTO): Item {
+        val item =  Item.itemFactory(itemDTO)
         itemDAO.create(item)
+        return item
     }
 
     suspend fun find(category: String, itemId: ItemId): Item? {
