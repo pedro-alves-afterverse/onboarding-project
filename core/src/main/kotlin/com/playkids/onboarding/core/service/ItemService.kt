@@ -13,7 +13,7 @@ class ItemService(
     private val profileDAO: ProfileDAO
 ) {
     suspend fun create(itemDTO: CreateItemDTO): Item {
-        val item =  Item.itemFactory(itemDTO)
+        val item = Item(itemDTO)
         itemDAO.create(item)
         return item
     }

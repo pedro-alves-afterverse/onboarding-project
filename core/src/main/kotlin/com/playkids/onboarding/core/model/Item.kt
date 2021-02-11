@@ -13,17 +13,13 @@ data class Item(
     val currency: ItemCurrencies,
     val price: Int
 ){
-    companion object{
-        fun itemFactory(itemDTO: CreateItemDTO): Item{
-            return Item(
-                id = UUID.randomUUID().toString(),
-                category = itemDTO.category,
-                image = itemDTO.image,
-                currency = itemDTO.currency,
-                price = itemDTO.price
-            )
-        }
-    }
+    constructor(itemDTO: CreateItemDTO): this(
+        id = UUID.randomUUID().toString(),
+        category = itemDTO.category,
+        image = itemDTO.image,
+        currency = itemDTO.currency,
+        price = itemDTO.price
+    )
 }
 
 data class ItemKey(

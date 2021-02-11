@@ -18,7 +18,7 @@ class ProfileService(
     private val itemDAO: ItemDAO
 ) {
     suspend fun create(profileDTO: CreateProfileDTO): Profile {
-        val profile = Profile.baseProfileFactory(profileDTO)
+        val profile = Profile(profileDTO)
         profileDAO.create(profile)
         return profile
     }

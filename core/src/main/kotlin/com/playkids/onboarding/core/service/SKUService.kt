@@ -8,7 +8,7 @@ class SKUService(
     private val skuDAO: SKUDAO,
 ) {
     suspend fun create(skuDTO: CreateSkuDTO): SKU {
-        val sku = SKU.skuFactory(skuDTO)
+        val sku = SKU(skuDTO)
         skuDAO.create(sku)
         return sku
     }

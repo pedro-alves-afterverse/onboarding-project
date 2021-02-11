@@ -16,17 +16,13 @@ data class Profile(
     val moneySpent: Float,
     val region: Regions
 ){
-    companion object{
-        fun baseProfileFactory(profileDTO: CreateProfileDTO): Profile{
-            return Profile(
-                id = UUID.randomUUID().toString(),
-                username = profileDTO.username,
-                items = emptyList(),
-                gem = 100,
-                coin = 500,
-                moneySpent = 0F,
-                region = profileDTO.region
-            )
-        }
-    }
+    constructor(profileDTO: CreateProfileDTO): this(
+        id = UUID.randomUUID().toString(),
+        username = profileDTO.username,
+        items = emptyList(),
+        gem = 100,
+        coin = 500,
+        moneySpent = 0F,
+        region = profileDTO.region
+    )
 }

@@ -11,14 +11,10 @@ data class SKU(
     val coin: Int,
     val price: Float
 ) {
-    companion object{
-        fun skuFactory(skuDTO: CreateSkuDTO): SKU{
-            return SKU(
-                id = UUID.randomUUID().toString(),
-                gem = skuDTO.gem,
-                coin = skuDTO.coin,
-                price = skuDTO.price
-            )
-        }
-    }
+    constructor(skuDTO: CreateSkuDTO): this(
+        id = UUID.randomUUID().toString(),
+        gem = skuDTO.gem,
+        coin = skuDTO.coin,
+        price = skuDTO.price
+    )
 }
