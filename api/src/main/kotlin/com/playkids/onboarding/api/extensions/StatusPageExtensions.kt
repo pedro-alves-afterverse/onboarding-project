@@ -46,7 +46,7 @@ fun StatusPages.Configuration.exceptions(logger: Logger) {
     exception<OperationNotSupportedException> {
         logger.warn("Failed to process request {}: {}", call.request.toLogString(), it.message, it)
 
-        call.respond(HttpStatusCode.NotFound, ErrorResponse(HttpStatusCode.NotImplemented, it.message ?: ""))
+        call.respond(HttpStatusCode. NotImplemented, ErrorResponse(HttpStatusCode.NotImplemented, it.message ?: ""))
     }
 
     exception<Throwable> {
