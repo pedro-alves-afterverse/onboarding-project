@@ -1,11 +1,11 @@
 package com.playkids.onboarding.data.listener.handler
 
-import com.playkids.onboarding.sqs.SQSHandler
+import com.playkids.onboarding.sqs.EventHandler
 import javax.naming.OperationNotSupportedException
 
 class SQSEventHandler(
     private val profileHandler: HandleProfile
-): SQSHandler {
+): EventHandler {
     override suspend fun handle(message: String, attributes: Map<String, String>) {
         when(attributes.getValue("entity")){
             "Profile" -> profileHandler.handle(message, attributes.getValue("operation"))

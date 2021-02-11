@@ -1,7 +1,7 @@
 package com.playkids.onboarding.data.listener
 
-import com.playkids.onboarding.sqs.SQSHandler
-import com.playkids.onboarding.sqs.SQSListener
+import com.playkids.onboarding.sqs.EventHandler
+import com.playkids.onboarding.sqs.EventListener
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.future.await
@@ -15,8 +15,8 @@ class DataListener(
     private val sqs: SqsAsyncClient,
     private val queueUrl: String,
     private val maxNumberOfMessages: Int,
-    private val messageHandler: SQSHandler
-): SQSListener {
+    private val messageHandler: EventHandler
+): EventListener {
 
     private val isRunning = AtomicBoolean(false)
 

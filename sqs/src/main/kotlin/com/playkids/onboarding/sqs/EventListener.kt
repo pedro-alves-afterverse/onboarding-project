@@ -2,7 +2,7 @@ package com.playkids.onboarding.sqs
 
 import kotlinx.coroutines.Job
 
-interface SQSListener {
+interface EventListener {
     fun stop()
     fun start(): Job
 }

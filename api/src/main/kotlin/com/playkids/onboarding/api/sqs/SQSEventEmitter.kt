@@ -1,6 +1,6 @@
 package com.playkids.onboarding.api.sqs
 
-import com.playkids.onboarding.sqs.SQSEmitter
+import com.playkids.onboarding.sqs.EventEmitter
 import com.playkids.onboarding.sqs.extensions.toMessageAttributeValue
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.future.await
@@ -11,7 +11,7 @@ import software.amazon.awssdk.services.sqs.model.SendMessageRequest
 class SQSEventEmitter(
     private val sqs: SqsAsyncClient,
     private val queueUrl: String
-): SQSEmitter {
+): EventEmitter {
 
     override fun sendEvent(message: String, attributes: Map<String, String>) = GlobalScope.launch {
         sqs.sendMessage(
