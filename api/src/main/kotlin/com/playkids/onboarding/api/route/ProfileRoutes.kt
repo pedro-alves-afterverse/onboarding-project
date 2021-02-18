@@ -5,7 +5,7 @@ import com.movile.kotlin.commons.ktor.post
 import com.playkids.onboarding.api.dto.AddItemDTO
 import com.playkids.onboarding.api.dto.AddSkuDTO
 import com.playkids.onboarding.api.dto.BuyItemDTO
-import com.playkids.onboarding.core.model.Profile
+import com.playkids.onboarding.core.dto.CreateProfileDTO
 import com.playkids.onboarding.core.service.ProfileService
 import io.ktor.application.*
 import io.ktor.features.*
@@ -14,10 +14,16 @@ import io.ktor.response.*
 import io.ktor.routing.*
 import io.ktor.util.pipeline.*
 
-fun Route.profileRouting(profileService: ProfileService) {
+fun Route.profileRouting(
+    profileService: ProfileService,
+) {
 
     fun PipelineContext<*, ApplicationCall>.id(): String {
         return call.parameters["id"] ?: throw IllegalArgumentException("an id must be provided")
+    }
+
+    fun PipelineContext<*, ApplicationCall>.category(): String {
+        return call.parameters["category"] ?: throw IllegalArgumentException("a category must be provided")
     }
 
     route("/profile") {
@@ -28,10 +34,25 @@ fun Route.profileRouting(profileService: ProfileService) {
 
             call.respond(profile)
         }
-        post<Profile> { profile ->
-            profileService.create(profile)
+        post<CreateProfileDTO> { profileDTO ->
+            val profile = profileService.create(profileDTO)
 
-            call.respondText("Profile Created", status = HttpStatusCode.OK)
+            call.respond(profile)
+        }
+        get("/items/{id}/{category}") {
+            val id = id()
+            val category = category()
+
+            val items = profileService.getProfileItemsByCategory(id, category) ?: throw NotFoundException("profile not found")
+
+            call.respond(items)
+        }
+        get("/currency/{id}") {
+            val id = id()
+
+            val currency = profileService.getProfileCurrency(id) ?: throw NotFoundException("profile not found")
+
+            call.respond(currency)
         }
         route("/add"){
             patch<AddItemDTO>("/item/{id}") {item ->

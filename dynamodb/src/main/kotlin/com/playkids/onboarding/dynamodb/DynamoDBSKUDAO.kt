@@ -30,6 +30,15 @@ class DynamoDBSKUDAO(config: Config, private val dynamoDbClient: DynamoDbAsyncCl
             ?.itemOrNull()
             ?.toSKU()
 
+    override suspend fun findAll(): List<SKU>? =
+        dynamoDbClient.scan {
+            it.tableName(tableName)
+        }
+            .awaitRaiseException()
+            ?.items()
+            ?.map { it.toSKU() }
+            ?.sortedBy { it.price }
+
 
     private fun SKU.toItem(): Map<String, AttributeValue> =
         mapOf(

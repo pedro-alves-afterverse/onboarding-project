@@ -2,6 +2,7 @@ package com.playkids.onboarding.api.route
 
 import com.movile.kotlin.commons.ktor.post
 import com.playkids.onboarding.api.extensions.logger
+import com.playkids.onboarding.core.dto.CreateItemDTO
 import com.playkids.onboarding.core.model.Item
 import com.playkids.onboarding.core.service.ItemService
 import io.ktor.application.*
@@ -48,10 +49,10 @@ fun Route.itemRouting(itemService: ItemService) {
 
             call.respond(items)
         }
-        post<Item> { item ->
-            itemService.create(item)
+        post<CreateItemDTO> { itemDTO ->
+            val item = itemService.create(itemDTO)
 
-            call.respondText("Item Created", status = HttpStatusCode.OK)
+            call.respond(item)
         }
     }
 }

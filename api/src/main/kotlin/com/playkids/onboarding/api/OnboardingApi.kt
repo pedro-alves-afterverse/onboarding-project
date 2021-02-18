@@ -22,7 +22,7 @@ class OnboardingApi(
     private val serverPort: Int,
     private val itemService: ItemService,
     private val skuService: SKUService,
-    private val profileService: ProfileService
+    private val profileService: ProfileService,
 ){
     fun start() {
         embeddedServer(Netty, serverPort) {
@@ -37,8 +37,16 @@ class OnboardingApi(
                 }
             }
 
+            install(CORS){
+                anyHost()
+                method(HttpMethod.Get)
+                method(HttpMethod.Post)
+                method(HttpMethod.Patch)
+                allowNonSimpleContentTypes = true
+            }
+
             routing {
-                get("/test") {
+                get("/health") {
                     call.respondText("HELLO WORLD!", contentType = ContentType.Text.Plain)
                 }
                 route("/api") {

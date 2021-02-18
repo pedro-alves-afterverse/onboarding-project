@@ -1,0 +1,3 @@
+dependencies {
+    api "com.movile:kotlin-commons-serialization:$kotlin_commons_version"
+}

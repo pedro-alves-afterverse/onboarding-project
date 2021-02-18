@@ -1,13 +1,16 @@
 package com.playkids.onboarding.api.configuration
 
 import com.playkids.onboarding.api.OnboardingApi
+import com.playkids.onboarding.sqs.emitter.SQSProfileEventEmitter
 import com.playkids.onboarding.core.service.ItemService
 import com.playkids.onboarding.core.service.ProfileService
 import com.playkids.onboarding.core.service.SKUService
+import com.playkids.onboarding.sqs.SQSEventEmitter
 import com.typesafe.config.ConfigFactory
 import software.amazon.awssdk.auth.credentials.DefaultCredentialsProvider
 import software.amazon.awssdk.regions.Region
 import software.amazon.awssdk.services.dynamodb.DynamoDbAsyncClient
+import software.amazon.awssdk.services.sqs.SqsAsyncClient
 
 object Configuration {
     private const val APPLICATION = "onboarding"
@@ -15,7 +18,7 @@ object Configuration {
     private val rootConfig = ConfigFactory.load()
     private val config = rootConfig.getConfig(APPLICATION)!!
 
-    val serverPort = config.getInt("server-port")
+    private val serverPort = config.getInt("server-port")
 
     private val credentialsProvider = DefaultCredentialsProvider.builder()
         .asyncCredentialUpdateEnabled(true)
@@ -25,6 +28,18 @@ object Configuration {
         .credentialsProvider(credentialsProvider)
         .region(Region.US_EAST_1)
         .build()
+
+    private val sqsClient = SqsAsyncClient.builder()
+        .credentialsProvider(credentialsProvider)
+        .region(Region.US_EAST_1)
+        .build()
+
+    private val sqsEventEmitter = SQSEventEmitter(
+        sqsClient,
+        "https://sqs.us-east-1.amazonaws.com/027396584751/onboarding-pedro-data-transfer"
+    )
+
+    private val sqsProfileHandler = SQSProfileEventEmitter(sqsEventEmitter)
 
     private val persistenceModule = PersistenceModule(
         config,
@@ -43,8 +58,10 @@ object Configuration {
     private val profileService = ProfileService(
         profileDAO = persistenceModule.profileDAO,
         skuDAO = persistenceModule.skuDAO,
-        itemDAO = persistenceModule.itemDAO
+        itemDAO = persistenceModule.itemDAO,
+        sqsProfileHandler
     )
+
 
     val server = OnboardingApi(serverPort, itemService, skuService, profileService)
 

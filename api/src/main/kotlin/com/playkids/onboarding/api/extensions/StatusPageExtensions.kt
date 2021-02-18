@@ -9,6 +9,7 @@ import io.ktor.features.*
 import io.ktor.http.*
 import io.ktor.response.*
 import org.slf4j.Logger
+import javax.naming.OperationNotSupportedException
 
 fun StatusPages.Configuration.exceptions(logger: Logger) {
 
@@ -40,6 +41,12 @@ fun StatusPages.Configuration.exceptions(logger: Logger) {
         logger.warn("Failed to process request {}: {}", call.request.toLogString(), it.message, it)
 
         call.respond(HttpStatusCode.BadRequest, ErrorResponse(HttpStatusCode.BadRequest, it.message ?: ""))
+    }
+
+    exception<OperationNotSupportedException> {
+        logger.warn("Failed to process request {}: {}", call.request.toLogString(), it.message, it)
+
+        call.respond(HttpStatusCode. NotImplemented, ErrorResponse(HttpStatusCode.NotImplemented, it.message ?: ""))
     }
 
     exception<Throwable> {
