@@ -1,7 +1,7 @@
-package com.playkids.onboarding.data.listener
+package com.playkids.onboarding.sqs
 
-import com.playkids.onboarding.sqs.EventHandler
-import com.playkids.onboarding.sqs.EventListener
+import com.playkids.onboarding.core.events.EventHandler
+import com.playkids.onboarding.core.events.EventListener
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.future.await
@@ -11,7 +11,7 @@ import software.amazon.awssdk.services.sqs.model.DeleteMessageRequest
 import software.amazon.awssdk.services.sqs.model.ReceiveMessageRequest
 import java.util.concurrent.atomic.AtomicBoolean
 
-class DataListener(
+class SQSEventListener(
     private val sqs: SqsAsyncClient,
     private val queueUrl: String,
     private val maxNumberOfMessages: Int,
@@ -44,7 +44,7 @@ class DataListener(
 
                     )
                         .await()
-            }
+                }
         } while (isRunning.get())
     }
 

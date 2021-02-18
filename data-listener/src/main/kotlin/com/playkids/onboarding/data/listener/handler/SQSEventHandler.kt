@@ -1,6 +1,6 @@
 package com.playkids.onboarding.data.listener.handler
 
-import com.playkids.onboarding.sqs.EventHandler
+import com.playkids.onboarding.core.events.EventHandler
 import javax.naming.OperationNotSupportedException
 
 class SQSEventHandler(

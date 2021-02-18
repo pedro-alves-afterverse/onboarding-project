@@ -12,6 +12,6 @@ interface ProfileDAO {
     suspend fun getItemsAndCurrency(id: ProfileId, currency: Currencies): Pair<List<ItemKey>, Int>?
     suspend fun addItem(profileId: ProfileId, item: List<String>)
     suspend fun updateCurrency(profileId: ProfileId, currency: Currencies, value: Number)
-    suspend fun getProfileItems(id: ProfileId): List<ItemKey>?
+    suspend fun getProfileItems(id: ProfileId): List<ItemKey>
     suspend fun getProfileCurrency(id: ProfileId): Map<Currencies, Int>?
 }

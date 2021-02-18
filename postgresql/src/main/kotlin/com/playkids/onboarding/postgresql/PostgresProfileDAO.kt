@@ -32,7 +32,11 @@ class PostgresProfileDAO(private val db: Connection): ProfileDAO {
         ).await()
     }
 
-    override suspend fun getProfileItems(id: ProfileId): List<ItemKey>? {
+    override suspend fun getProfileItems(id: ProfileId): List<ItemKey> {
+        throw OperationNotSupportedException("Operation not supported")
+    }
+
+    override suspend fun getProfileCurrency(id: ProfileId): Map<Currencies, Int>? {
         throw OperationNotSupportedException("Operation not supported")
     }
 

@@ -2,14 +2,10 @@ package com.playkids.onboarding.api.route
 
 import com.movile.kotlin.commons.ktor.patch
 import com.movile.kotlin.commons.ktor.post
-import com.movile.kotlin.commons.serialization.toJson
 import com.playkids.onboarding.api.dto.AddItemDTO
 import com.playkids.onboarding.api.dto.AddSkuDTO
 import com.playkids.onboarding.api.dto.BuyItemDTO
-import com.playkids.onboarding.api.sqs.SQSEventEmitter
-import com.playkids.onboarding.api.sqs.handler.SQSProfileHandler
 import com.playkids.onboarding.core.dto.CreateProfileDTO
-import com.playkids.onboarding.core.model.Profile
 import com.playkids.onboarding.core.service.ProfileService
 import io.ktor.application.*
 import io.ktor.features.*
@@ -20,7 +16,6 @@ import io.ktor.util.pipeline.*
 
 fun Route.profileRouting(
     profileService: ProfileService,
-    sqsHandler: SQSProfileHandler
 ) {
 
     fun PipelineContext<*, ApplicationCall>.id(): String {
@@ -41,8 +36,6 @@ fun Route.profileRouting(
         }
         post<CreateProfileDTO> { profileDTO ->
             val profile = profileService.create(profileDTO)
-
-            sqsHandler.handleInsert(profile)
 
             call.respond(profile)
         }
@@ -75,9 +68,7 @@ fun Route.profileRouting(
             patch<AddSkuDTO>("/sku/{id}") {sku ->
                 val id = id()
 
-                val currency = profileService.addSku(id, sku.skuId)
-
-                sqsHandler.handleUpdate(currency)
+                profileService.addSku(id, sku.skuId)
 
                 call.respondText("SKU added to profile", status = HttpStatusCode.OK)
             }
@@ -85,9 +76,7 @@ fun Route.profileRouting(
             patch<BuyItemDTO>("/item/{id}") {item ->
                 val id = id()
 
-                val currency = profileService.buyItem(id, item.id, item.category)
-
-                sqsHandler.handleUpdate(currency)
+                profileService.buyItem(id, item.id, item.category)
 
                 call.respondText("Item bought successfully", status = HttpStatusCode.OK)
 

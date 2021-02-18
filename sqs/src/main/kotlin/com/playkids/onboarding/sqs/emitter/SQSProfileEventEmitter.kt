@@ -1,15 +1,16 @@
-package com.playkids.onboarding.api.sqs.handler
+package com.playkids.onboarding.sqs.emitter
 
 import com.movile.kotlin.commons.serialization.toJson
 import com.playkids.onboarding.core.dto.UpdateCurrencyDTO
 import com.playkids.onboarding.core.model.Profile
-import com.playkids.onboarding.sqs.EventEmitter
+import com.playkids.onboarding.core.events.EventEmitter
+import com.playkids.onboarding.core.events.emitter.ProfileEventEmitter
 
-class SQSProfileHandler(
+class SQSProfileEventEmitter(
     private val eventEmitter: EventEmitter
-){
+): ProfileEventEmitter{
 
-    suspend fun handleInsert(profile: Profile){
+    override suspend fun handleInsert(profile: Profile){
         val sqsAttributes = mapOf(
             "entity" to "Profile",
             "operation" to "insert"
@@ -18,7 +19,7 @@ class SQSProfileHandler(
         eventEmitter.sendEvent(profile.toJson().get(), sqsAttributes).join()
     }
 
-    suspend fun handleUpdate(updateCurrencyDTO: UpdateCurrencyDTO){
+    override suspend fun handleUpdate(updateCurrencyDTO: UpdateCurrencyDTO){
         val sqsAttributes = mapOf(
             "entity" to "Profile",
             "operation" to "update"

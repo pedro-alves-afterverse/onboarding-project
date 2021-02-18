@@ -1,6 +1,6 @@
-package com.playkids.onboarding.api.sqs
+package com.playkids.onboarding.sqs
 
-import com.playkids.onboarding.sqs.EventEmitter
+import com.playkids.onboarding.core.events.EventEmitter
 import com.playkids.onboarding.sqs.extensions.toMessageAttributeValue
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.future.await

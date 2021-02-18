@@ -6,8 +6,6 @@ import com.playkids.onboarding.api.extensions.logger
 import com.playkids.onboarding.api.route.itemRouting
 import com.playkids.onboarding.api.route.profileRouting
 import com.playkids.onboarding.api.route.skuRouting
-import com.playkids.onboarding.api.sqs.SQSEventEmitter
-import com.playkids.onboarding.api.sqs.handler.SQSProfileHandler
 import com.playkids.onboarding.core.service.ItemService
 import com.playkids.onboarding.core.service.ProfileService
 import com.playkids.onboarding.core.service.SKUService
@@ -25,7 +23,6 @@ class OnboardingApi(
     private val itemService: ItemService,
     private val skuService: SKUService,
     private val profileService: ProfileService,
-    private val sqsProfileHandler: SQSProfileHandler
 ){
     fun start() {
         embeddedServer(Netty, serverPort) {
@@ -49,13 +46,13 @@ class OnboardingApi(
             }
 
             routing {
-                get("/test") {
+                get("/health") {
                     call.respondText("HELLO WORLD!", contentType = ContentType.Text.Plain)
                 }
                 route("/api") {
                     itemRouting(itemService)
                     skuRouting(skuService)
-                    profileRouting(profileService, sqsProfileHandler)
+                    profileRouting(profileService)
                 }
 
             }

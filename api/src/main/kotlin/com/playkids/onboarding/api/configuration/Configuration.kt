@@ -1,11 +1,11 @@
 package com.playkids.onboarding.api.configuration
 
 import com.playkids.onboarding.api.OnboardingApi
-import com.playkids.onboarding.api.sqs.SQSEventEmitter
-import com.playkids.onboarding.api.sqs.handler.SQSProfileHandler
+import com.playkids.onboarding.sqs.emitter.SQSProfileEventEmitter
 import com.playkids.onboarding.core.service.ItemService
 import com.playkids.onboarding.core.service.ProfileService
 import com.playkids.onboarding.core.service.SKUService
+import com.playkids.onboarding.sqs.SQSEventEmitter
 import com.typesafe.config.ConfigFactory
 import software.amazon.awssdk.auth.credentials.DefaultCredentialsProvider
 import software.amazon.awssdk.regions.Region
@@ -39,7 +39,7 @@ object Configuration {
         "https://sqs.us-east-1.amazonaws.com/027396584751/onboarding-pedro-data-transfer"
     )
 
-    private val sqsProfileHandler = SQSProfileHandler(sqsEventEmitter)
+    private val sqsProfileHandler = SQSProfileEventEmitter(sqsEventEmitter)
 
     private val persistenceModule = PersistenceModule(
         config,
@@ -58,11 +58,12 @@ object Configuration {
     private val profileService = ProfileService(
         profileDAO = persistenceModule.profileDAO,
         skuDAO = persistenceModule.skuDAO,
-        itemDAO = persistenceModule.itemDAO
+        itemDAO = persistenceModule.itemDAO,
+        sqsProfileHandler
     )
 
 
-    val server = OnboardingApi(serverPort, itemService, skuService, profileService, sqsProfileHandler)
+    val server = OnboardingApi(serverPort, itemService, skuService, profileService)
 
 
 }

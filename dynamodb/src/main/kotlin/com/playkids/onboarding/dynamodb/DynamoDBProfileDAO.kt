@@ -60,16 +60,15 @@ class DynamoDBProfileDAO(config: Config, private val dynamoDbClient: DynamoDbAsy
             .awaitRaiseException()
     }
 
-    override suspend fun getProfileItems(id: ProfileId): List<ItemKey>? {
+    override suspend fun getProfileItems(id: ProfileId): List<ItemKey> {
         val projection = mapOf("#i" to "items")
-        return this.query(id, projection)?.toItemList()
+        return this.query(id, projection)?.toItemList().orEmpty()
     }
 
     override suspend fun getProfileCurrency(id: ProfileId): Map<Currencies, Int>? {
         val projection = mapOf("#c" to "coin", "#g" to "gem")
         return this.query(id, projection)?.toCurrency()
     }
-
 
     private suspend fun query(id: ProfileId, projection: Map<String, String>? = null) =
         dynamoDbClient.getItem {
@@ -83,7 +82,6 @@ class DynamoDBProfileDAO(config: Config, private val dynamoDbClient: DynamoDbAsy
             .awaitRaiseException()
             ?.itemOrNull()
 
-
     private fun Profile.toItem(): Map<String, AttributeValue> =
         mapOf(
             ID to id.toAttributeValue(),
@@ -94,7 +92,6 @@ class DynamoDBProfileDAO(config: Config, private val dynamoDbClient: DynamoDbAsy
             MONEY_SPENT to moneySpent.toAttributeValue(),
             REGION to region.toString().toAttributeValue()
         )
-
 
     private fun Map<String, AttributeValue>.toProfile(): Profile =
         Profile(
@@ -107,7 +104,6 @@ class DynamoDBProfileDAO(config: Config, private val dynamoDbClient: DynamoDbAsy
             region = Regions.valueOf(string(REGION)!!)
         )
 
-
     private fun Map<String, AttributeValue>.toItemsCurrency(currency: String): Pair<List<ItemKey>, Int> =
         listOfItemKey(ITEMS)!! to int(currency)!!
 
@@ -119,7 +115,6 @@ class DynamoDBProfileDAO(config: Config, private val dynamoDbClient: DynamoDbAsy
             ProfileCurrencies.COIN to int(COIN)!!,
             ProfileCurrencies.GEM to int(GEM)!!
         )
-
 
     companion object {
         private const val ID = "id"

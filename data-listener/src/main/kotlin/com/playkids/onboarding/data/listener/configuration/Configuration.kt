@@ -2,9 +2,9 @@ package com.playkids.onboarding.data.listener.configuration
 
 import com.github.jasync.sql.db.ConnectionPoolConfiguration
 import com.github.jasync.sql.db.postgresql.PostgreSQLConnectionBuilder
-import com.playkids.onboarding.data.listener.DataListener
 import com.playkids.onboarding.data.listener.handler.HandleProfile
 import com.playkids.onboarding.data.listener.handler.SQSEventHandler
+import com.playkids.onboarding.sqs.SQSEventListener
 import software.amazon.awssdk.auth.credentials.DefaultCredentialsProvider
 import software.amazon.awssdk.regions.Region
 import software.amazon.awssdk.services.sqs.SqsAsyncClient
@@ -35,7 +35,7 @@ object Configuration {
 
     private val eventHandler = SQSEventHandler(profileHandler)
 
-    val dataListener = DataListener(
+    val eventListener = SQSEventListener(
         sqs = sqsClient,
         queueUrl = "https://sqs.us-east-1.amazonaws.com/027396584751/onboarding-pedro-data-transfer",
         maxNumberOfMessages = 5,

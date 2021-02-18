@@ -1,4 +1,4 @@
-package com.playkids.onboarding.sqs
+package com.playkids.onboarding.core.events
 
 import kotlinx.coroutines.Job
 
