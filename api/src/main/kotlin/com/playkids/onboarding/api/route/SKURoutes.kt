@@ -20,6 +20,11 @@ fun Route.skuRouting(skuService: SKUService) {
     }
 
     route("/sku") {
+        get {
+            val skus = skuService.findAll() ?: throw NotFoundException("no skus found")
+
+            call.respond(skus)
+        }
         get("{id}") {
             val id = id()
 

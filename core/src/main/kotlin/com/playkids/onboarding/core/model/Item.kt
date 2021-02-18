@@ -23,8 +23,8 @@ data class Item(
 }
 
 data class ItemKey(
-    private val category: String,
-    private val id: ItemId
+    val category: String,
+    val id: ItemId
 ){
     fun getKey() = "$category:$id"
 

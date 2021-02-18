@@ -27,6 +27,10 @@ fun Route.profileRouting(
         return call.parameters["id"] ?: throw IllegalArgumentException("an id must be provided")
     }
 
+    fun PipelineContext<*, ApplicationCall>.category(): String {
+        return call.parameters["category"] ?: throw IllegalArgumentException("a category must be provided")
+    }
+
     route("/profile") {
         get("{id}") {
             val id = id()
@@ -41,6 +45,21 @@ fun Route.profileRouting(
             sqsHandler.handleInsert(profile)
 
             call.respond(profile)
+        }
+        get("/items/{id}/{category}") {
+            val id = id()
+            val category = category()
+
+            val items = profileService.getProfileItemsByCategory(id, category) ?: throw NotFoundException("profile not found")
+
+            call.respond(items)
+        }
+        get("/currency/{id}") {
+            val id = id()
+
+            val currency = profileService.getProfileCurrency(id) ?: throw NotFoundException("profile not found")
+
+            call.respond(currency)
         }
         route("/add"){
             patch<AddItemDTO>("/item/{id}") {item ->

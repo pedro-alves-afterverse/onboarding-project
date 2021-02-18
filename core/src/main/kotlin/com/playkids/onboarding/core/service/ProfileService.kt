@@ -9,6 +9,7 @@ import com.playkids.onboarding.core.model.*
 import com.playkids.onboarding.core.persistence.ItemDAO
 import com.playkids.onboarding.core.persistence.ProfileDAO
 import com.playkids.onboarding.core.persistence.SKUDAO
+import com.playkids.onboarding.core.util.Currencies
 import com.playkids.onboarding.core.util.ItemCurrencies
 import com.playkids.onboarding.core.util.ProfileCurrencies
 
@@ -55,4 +56,12 @@ class ProfileService(
 
         return UpdateCurrencyDTO(profileId, sku.coin, sku.gem, sku.price)
     }
+
+    suspend fun getProfileItemsByCategory(profileId: ProfileId, category: String): List<Item?>? {
+        val itemsKeys = profileDAO.getProfileItems(profileId)
+        return itemsKeys?.filter { it.category == category }?.map { itemDAO.find(it.category, it.id) }
+    }
+
+    suspend fun getProfileCurrency(profileId: ProfileId): Map<Currencies, Int>? =
+        profileDAO.getProfileCurrency(profileId)
 }

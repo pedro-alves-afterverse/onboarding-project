@@ -4,6 +4,7 @@ import com.movile.kotlin.commons.dynamodb.*
 import com.playkids.onboarding.core.model.*
 import com.playkids.onboarding.core.persistence.ProfileDAO
 import com.playkids.onboarding.core.util.Currencies
+import com.playkids.onboarding.core.util.ProfileCurrencies
 import com.playkids.onboarding.dynamodb.extensions.*
 import com.typesafe.config.Config
 import software.amazon.awssdk.services.dynamodb.DynamoDbAsyncClient
@@ -64,6 +65,11 @@ class DynamoDBProfileDAO(config: Config, private val dynamoDbClient: DynamoDbAsy
         return this.query(id, projection)?.toItemList()
     }
 
+    override suspend fun getProfileCurrency(id: ProfileId): Map<Currencies, Int>? {
+        val projection = mapOf("#c" to "coin", "#g" to "gem")
+        return this.query(id, projection)?.toCurrency()
+    }
+
 
     private suspend fun query(id: ProfileId, projection: Map<String, String>? = null) =
         dynamoDbClient.getItem {
@@ -107,6 +113,13 @@ class DynamoDBProfileDAO(config: Config, private val dynamoDbClient: DynamoDbAsy
 
     private fun Map<String, AttributeValue>.toItemList(): List<ItemKey>? =
         listOfItemKey(ITEMS)
+
+    private fun Map<String, AttributeValue>.toCurrency(): Map<Currencies, Int> =
+        mapOf(
+            ProfileCurrencies.COIN to int(COIN)!!,
+            ProfileCurrencies.GEM to int(GEM)!!
+        )
+
 
     companion object {
         private const val ID = "id"

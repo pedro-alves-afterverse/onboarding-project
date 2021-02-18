@@ -40,6 +40,13 @@ class OnboardingApi(
                 }
             }
 
+            install(CORS){
+                anyHost()
+                method(HttpMethod.Get)
+                method(HttpMethod.Post)
+                method(HttpMethod.Patch)
+            }
+
             routing {
                 get("/test") {
                     call.respondText("HELLO WORLD!", contentType = ContentType.Text.Plain)

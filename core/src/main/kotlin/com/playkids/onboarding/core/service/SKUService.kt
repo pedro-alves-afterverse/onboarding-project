@@ -16,4 +16,8 @@ class SKUService(
     suspend fun find(id: String): SKU? {
         return skuDAO.find(id)
     }
+
+    suspend fun findAll(): List<SKU>? {
+        return skuDAO.findAll()
+    }
 }
