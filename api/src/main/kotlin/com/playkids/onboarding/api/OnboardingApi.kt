@@ -45,6 +45,7 @@ class OnboardingApi(
                 method(HttpMethod.Get)
                 method(HttpMethod.Post)
                 method(HttpMethod.Patch)
+                allowNonSimpleContentTypes = true
             }
 
             routing {
